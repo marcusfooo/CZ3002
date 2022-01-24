@@ -1,31 +1,4 @@
-# React + Flask Development Boilerplate
-
-## Overview
-Extremely lightweight development environment for a web application
-running a [React](https://reactjs.org/) front-end and 
-[Flask](http://flask.pocoo.org/) API back-end. The 
-front-end connects to the back-end by making HTTP requests for
-desired data. React and Flask are containerized and managed with 
-[Docker Compose](https://docs.docker.com/compose/).
-
-### Why Create React App?
-[Create React App](https://facebook.github.io/create-react-app/) allows 
-us to very easily *create a React app* with no build configuration. React is 
-currently one of the most popular front-end Javascript libraries for 
-building UIs.
-
-### Why Flask?
-Flask is a lightweight, highly-customizable micro-framework for Python. It let's
-us build really simple web applications quickly ([the "hello world" app is literally 5 
-lines of code](http://flask.pocoo.org/docs/1.0/quickstart/#a-minimal-application)).
-Flask doesn't come built-in with much, and if you're looking to integrate a more 
-robust back-end framework with React (say, Ruby on Rails), I'd recommend checking
-out [this blog post](https://medium.com/superhighfives/a-top-shelf-web-stack-rails-5-api-activeadmin-create-react-app-de5481b7ec0b).
-
-### Why Docker Compose?
-[Docker](https://www.docker.com/) maintains software and all of its dependencies within a "container",
-which can make collaborating and deploying simpler. [Docker Compose](https://docs.docker.com/compose/)
-is a tool for easily managing applications running multiple Docker containers. 
+# CZ2006
 
 ## How to Use
 Firstly, download [Docker desktop](https://www.docker.com/products/docker-desktop) and follow its
@@ -67,14 +40,11 @@ Finally, to gracefully stop running our local servers, you can run
 
 in a separate terminal window or press __control + C__.
 
+## Update requirements.txt from conda
+pip list --format=freeze > requirements.txt
 
-## Future plans
-* Add boilerplate for running tests locally and through continuous integration.
-* Add boilerplate for configuring production-ready settings and deployment.
-
-
-## License
-Feel free to use the code in this repository however you wish. Details are provided in
-[LICENSE.md](LICENSE.md).
-
-
+## To reset/clean docker containers
+docker-compose down
+docker ps --all
+docker volume prune
+rm -rf *-data
