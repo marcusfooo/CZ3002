@@ -6,7 +6,7 @@ import Container from "react-bootstrap/Container";
 
 export default function Header() {
   return (
-    <Navbar bg="light" expand="sm">
+    <Navbar bg="primary" expand="sm" className="px-3">
       <Container fluid>
         <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
