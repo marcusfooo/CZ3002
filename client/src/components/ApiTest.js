@@ -20,7 +20,7 @@ export default function ApiTest() {
       <ul>
         {items &&
           items.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} style={{ color: "white" }}>
               {item.name} {item.price}
             </li>
           ))}
