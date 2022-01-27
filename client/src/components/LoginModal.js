@@ -8,6 +8,7 @@ import * as yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Container from "react-bootstrap/esm/Container";
+import axios from "../axios";
 
 const loginSchema = yup
   .object({
@@ -49,14 +50,24 @@ export default function LoginModal() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  const signupSubmit = (data) => {
+  const signupSubmit = async (data) => {
     console.log(data);
     //TODO: post request
+    const res = await axios.post("/api/signup", data, {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log(res);
   };
 
-  const loginSubmit = (data) => {
+  const loginSubmit = async (data) => {
     console.log(data);
     //TODO: post request
+    const res = await axios.post("/api/login", data, {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log(res);
   };
 
   return (

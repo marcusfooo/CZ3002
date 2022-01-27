@@ -4,8 +4,11 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Container from "react-bootstrap/Container";
 import LoginModal from "./LoginModal";
+import { useUser } from "../contexts/UserContext";
 
 export default function Header() {
+  const { currentUser } = useUser();
+  console.log(currentUser);
   return (
     <Navbar bg="primary" expand="sm" className="px-3">
       <Container fluid>
@@ -20,7 +23,13 @@ export default function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link href="#home">Home</Nav.Link>
-            <LoginModal />
+            {currentUser ? (
+              <Navbar.Text>
+                Signed in as: {currentUser.email.split("@")[0]}
+              </Navbar.Text>
+            ) : (
+              <LoginModal />
+            )}
             <NavDropdown title="Dropdown" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">
