@@ -1,16 +1,21 @@
 from flask import Blueprint, jsonify, make_response, redirect, url_for, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
-from flask_login import login_user, login_required, logout_user
+from flask_login import current_user, login_user, login_required, logout_user
 from . import db
 
 auth = Blueprint('auth', __name__)
 
+@auth.route("/user", methods=["GET"])
+@login_required
+def get_user():
+    return make_response(jsonify({"email": current_user.email}))
+
 @auth.route('/login', methods=['POST'])
 def login_post():
     # login code goes here
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.json['email']
+    password = request.json['password']
 
     user = User.query.filter_by(email=email).first()
 
@@ -23,17 +28,16 @@ def login_post():
     login_user(user)
     return make_response(jsonify({"message": "Successfully authenticated"}), 200)
 
-@auth.route('/signup', methods=['POST', "OPTIONS"])
+@auth.route('/signup', methods=['POST'])
 def signup_post():
     # code to validate and add user to database goes here
-    email = request.form.get('email')
-    print(email)
-    password = request.form.get('password')
+    email = request.json["email"]
+    password = request.json["password"]
 
     user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
 
     if user: # if a user is found, we want to redirect back to signup page so user can try again
-        response = make_response(jsonify({"message": "Email already exists please try again."}), 404)
+        response = make_response(jsonify({"message": "Email already exists please try again."}), 400)
         return response
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.

@@ -8,8 +8,11 @@ import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Button from "react-bootstrap/Button";
 import { AiOutlineSearch } from "react-icons/ai";
 import Container from "react-bootstrap/esm/Container";
+import { useUser } from "../contexts/UserContext";
 
 export default function Home() {
+  const { currentUser } = useUser();
+  console.log(currentUser);
   return (
     <div className="home">
       <div className="bg"></div>

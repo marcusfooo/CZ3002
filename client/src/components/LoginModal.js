@@ -55,13 +55,19 @@ export default function LoginModal() {
     //TODO: post request
     const res = await axios.post("/api/signup", data, {
       withCredentials: true,
+      headers: { "Content-Type": "application/json" },
     });
     console.log(res);
   };
 
-  const loginSubmit = (data) => {
+  const loginSubmit = async (data) => {
     console.log(data);
     //TODO: post request
+    const res = await axios.post("/api/login", data, {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log(res);
   };
 
   return (
