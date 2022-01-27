@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, make_response
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/api/v1.0/test', methods=['GET'])
 def test_response():
