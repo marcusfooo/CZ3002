@@ -1,3 +1,4 @@
+import axios from "../axios";
 import React, { useEffect, useState } from "react";
 
 export default function ApiTest() {
@@ -6,9 +7,8 @@ export default function ApiTest() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1.0/test");
-        const data = await res.json();
-        setItems(data.items);
+        const res = await axios.get("/api/v1.0/test");
+        setItems(res.data.items);
       } catch (error) {
         console.error(error);
       }

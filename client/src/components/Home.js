@@ -15,7 +15,7 @@ export default function Home() {
       <div className="bg"></div>
       <ApiTest />
       <Form>
-        <Container fluid="md" className="form-container">
+        <Container fluid="sm" className="form-container">
           <Row>
             <Col sm>
               <FloatingLabel label="Location">
