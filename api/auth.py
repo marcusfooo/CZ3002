@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, make_response, redirect, url_for, request
+from flask import Blueprint, jsonify, make_response, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
 from flask_login import current_user, login_user, login_required, logout_user
@@ -50,7 +50,7 @@ def signup_post():
     response = make_response(jsonify({"message": "Signed up"}))
     return response
 
-@auth.route('/logout')
+@auth.route('/logout', methods=["GET"])
 @login_required
 def logout():
     logout_user()

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -9,6 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Container from "react-bootstrap/esm/Container";
 import axios from "../axios";
+import { useUser } from "../contexts/UserContext";
 
 const loginSchema = yup
   .object({
@@ -36,6 +37,7 @@ const signupSchema = yup
 export default function LoginModal() {
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const { setCurrentUser } = useUser();
   const {
     handleSubmit: handleSignupSubmit,
     control: signupControl,
@@ -51,30 +53,34 @@ export default function LoginModal() {
   const handleShow = () => setShow(true);
 
   const signupSubmit = async (data) => {
-    console.log(data);
-    //TODO: post request
-    const res = await axios.post("/api/signup", data, {
-      withCredentials: true,
-      headers: { "Content-Type": "application/json" },
-    });
-    console.log(res);
+    try {
+      await axios.post("/api/signup", data, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
+      setCurrentUser({ email: data.email });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const loginSubmit = async (data) => {
-    console.log(data);
-    //TODO: post request
-    const res = await axios.post("/api/login", data, {
-      withCredentials: true,
-      headers: { "Content-Type": "application/json" },
-    });
-    console.log(res);
+    try {
+      await axios.post("/api/login", data, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
+      setCurrentUser({ email: data.email });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <>
-      <Nav.Link variant="primary" onClick={handleShow}>
+      <NavDropdown.Item variant="primary" onClick={handleShow}>
         Login
-      </Nav.Link>
+      </NavDropdown.Item>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
