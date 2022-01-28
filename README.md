@@ -22,7 +22,12 @@
    source venv/Scripts/activate
    pip install -r requirements.txt
    ```
-   Start the server with `flask run`
+   Start the server with
+   ```
+   export FLASK_APP=api
+   export FLASK_DEBUG=1
+   flask run
+   ```
 
 ## How to Use
 
