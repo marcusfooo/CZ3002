@@ -1,98 +1,234 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
-import Form from "react-bootstrap/Form";
 import ImageUploading from "react-images-uploading";
 import Container from "react-bootstrap/Container";
 import "../styles/NewListing.css";
 import Button from "react-bootstrap/Button";
 import { AiFillDelete } from "react-icons/ai";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import Col from "react-bootstrap/Col";
+
+const listingSchema = yup
+  .object({
+    isRental: yup.boolean().required(),
+    postalCode: yup.string().matches(/\d{6}/).required(),
+    location: yup.string().required(),
+    isRoom: yup.boolean().required(),
+    description: yup.string().max(500),
+    price: yup.number().integer().required(),
+    numRooms: yup.number().integer().lessThan(6).moreThan(0).required(),
+
+    seller_id: yup.number().required(),
+  })
+  .required();
 
 export default function NewListing() {
   const [images, setImages] = useState([]);
-  const maxNumber = 69;
+  const maxImageNumber = 69;
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+  const watchListingType = watch("isRental");
+
+  const postListing = (data) => {
+    console.log(data);
+    data.isRental = data.isRental === "renting" ? true : false;
+    data.isRoom = data.isRoom === "room" ? true : false;
+    //TODO
+    const location = "somelocation";
+    const finalData = {
+      ...data,
+      location: location,
+    };
+    //validate the schema
+    listingSchema.validate();
+  };
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
     console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
+
+  useEffect(() => {
+    if (watchListingType === "selling") {
+      setValue("isRoom", "unit");
+    }
+  }, [watchListingType, setValue]);
+
   return (
     <Container className="mt-3">
       <h3>What are you listing?</h3>
       <Row sm={1} lg={2} className="g-4">
-        <Card>
-          <Card.Body>
-            <ImageUploading
-              multiple
-              value={images}
-              onChange={onChange}
-              maxNumber={maxNumber}
-              dataURLKey="data_url"
-            >
-              {({
-                imageList,
-                onImageUpload,
-                onImageRemoveAll,
-                onImageUpdate,
-                onImageRemove,
-                isDragging,
-                dragProps,
-              }) => (
-                // write your building UI
-                <div>
-                  <div
-                    className="uploadBox"
-                    {...dragProps}
-                    style={
-                      isDragging ? { filter: "brightness(50%)" } : undefined
-                    }
-                  >
-                    <Button onClick={onImageUpload}>Click or Drop here</Button>
-                  </div>
-                  &nbsp;
-                  <Button
-                    className="mt-2"
-                    variant="secondary"
-                    onClick={onImageRemoveAll}
-                  >
-                    Remove all images
-                  </Button>
-                  {imageList.map((image, index) => (
-                    <div key={index} className="image-item">
-                      <img src={image["data_url"]} alt="" width="100" />
-                      <div className="image-item__btn-wrapper">
-                        <button onClick={() => onImageUpdate(index)}>
-                          Update
-                        </button>
-                        <Button
-                          variant="light"
-                          className="mt-2"
-                          onClick={() => onImageRemove(index)}
-                        >
-                          <AiFillDelete size={"1.5em"} />
-                        </Button>
-                      </div>
+        <Col>
+          <Card>
+            <Card.Body>
+              <ImageUploading
+                multiple
+                value={images}
+                onChange={onChange}
+                maxNumber={maxImageNumber}
+                dataURLKey="data_url"
+              >
+                {({
+                  imageList,
+                  onImageUpload,
+                  onImageRemoveAll,
+                  onImageUpdate,
+                  onImageRemove,
+                  isDragging,
+                  dragProps,
+                }) => (
+                  // write your building UI
+                  <div>
+                    <div
+                      className="uploadBox"
+                      {...dragProps}
+                      style={
+                        isDragging ? { filter: "brightness(50%)" } : undefined
+                      }
+                    >
+                      <Button onClick={onImageUpload}>
+                        Click or Drop here
+                      </Button>
                     </div>
-                  ))}
+                    &nbsp;
+                    <Button
+                      className="mt-2"
+                      variant="secondary"
+                      onClick={onImageRemoveAll}
+                    >
+                      Remove all images
+                    </Button>
+                    {imageList.map((image, index) => (
+                      <div key={index} className="image-item">
+                        <img src={image["data_url"]} alt="" width="100" />
+                        <div className="image-item__btn-wrapper">
+                          <button onClick={() => onImageUpdate(index)}>
+                            Update
+                          </button>
+                          <Button
+                            variant="light"
+                            className="mt-2"
+                            onClick={() => onImageRemove(index)}
+                          >
+                            <AiFillDelete size={"1.5em"} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ImageUploading>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card>
+            <Card.Body>
+              <form onSubmit={handleSubmit(postListing)}>
+                <div className="form-group">
+                  <label htmlFor="listingType">Listing Type</label>
+                  <select
+                    {...register("isRental")}
+                    className="form-select"
+                    id="listingType"
+                    required
+                  >
+                    <option value="">Are you renting or selling?</option>
+                    <option value="renting">Renting</option>
+                    <option value="selling">Selling</option>
+                  </select>
                 </div>
-              )}
-            </ImageUploading>
-          </Card.Body>
-        </Card>
-        <Card>
-          <Card.Body>
-            <Form>
-              <Form.Group>
-                <Form.Label>Listing type</Form.Label>
-                <Form.Select>
-                  <option>Listing type</option>
-                  <option value={1}>Listing type</option>
-                </Form.Select>
-              </Form.Group>
-            </Form>
-          </Card.Body>
-        </Card>
+                <div className="form-group mt-3">
+                  <label htmlFor="postalCode">Postal Code</label>
+                  <input
+                    id="postalCode"
+                    type="number"
+                    className="form-control"
+                    {...register("postalCode")}
+                    required
+                  />
+                </div>
+                <div className="form-group mt-3">
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="flexRadioDefault1"
+                      value="room"
+                      name="isRoom"
+                      disabled={watchListingType === "selling"}
+                      {...register("isRoom")}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="flexRadioDefault1"
+                    >
+                      Rooms
+                    </label>
+                  </div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      id="flexRadioDefault2"
+                      value="unit"
+                      name="isRoom"
+                      {...register("isRoom")}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="flexRadioDefault2"
+                    >
+                      Whole unit
+                    </label>
+                  </div>
+                </div>
+
+                <div className="form-group mt-3">
+                  <label htmlFor="numRooms">Number of Rooms</label>
+                  <select
+                    {...register("numRooms")}
+                    className="form-select"
+                    id="numRooms"
+                    required
+                  >
+                    <option>How many rooms?</option>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                  </select>
+                </div>
+                <div className="form-group mt-3">
+                  <label htmlFor="price">Price</label>
+                  <input
+                    id="price"
+                    {...register("price")}
+                    type="number"
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="form-group mt-3">
+                  <label htmlFor="description">Description</label>
+                  <textarea
+                    id="description"
+                    placeholder="Give a short description"
+                    {...register("description")}
+                    className="form-control"
+                    rows={3}
+                  />
+                </div>
+              </form>
+            </Card.Body>
+          </Card>
+        </Col>
       </Row>
     </Container>
   );
