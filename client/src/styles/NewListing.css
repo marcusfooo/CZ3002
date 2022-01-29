@@ -1,0 +1,9 @@
+.uploadBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffedcb;
+  border: 1px dashed var(--accent);
+  padding: 2em;
+  transition: all 300ms ease;
+}
