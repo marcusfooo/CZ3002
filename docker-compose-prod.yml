@@ -9,23 +9,27 @@ services:
       - "80:80"
   api:
     image: 635728122877.dkr.ecr.ap-southeast-1.amazonaws.com/cz2006-api
-    build:
-        context: ./api
+    build: api
+    command: ["flask", "run", "--host=0.0.0.0"]
     volumes:
       - ./api:/backend
-    #env_file:
-     # - ./api/dev.env
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
     ports:
       - "5000:5000"
+
   client:
     image: 635728122877.dkr.ecr.ap-southeast-1.amazonaws.com/cz2006-client
-    build:
-      context: ./client
+    build: client
+    command: ["npm", "start"]
     volumes:
-      - node-modules:/frontend/node_modules
       - ./client:/frontend
+      - node-modules:/frontend/node_modules
+    environment:
+      - NODE_ENV=development
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - api
 
