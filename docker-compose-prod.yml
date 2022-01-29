@@ -13,8 +13,8 @@ services:
         context: ./api
     volumes:
       - ./api:/backend
-    env_file:
-      - ./api/dev.env
+    #env_file:
+     # - ./api/dev.env
     ports:
       - "5000:5000"
   client:
