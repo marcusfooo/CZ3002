@@ -7,6 +7,7 @@ import LoginModal from "./LoginModal";
 import { useUser } from "../contexts/UserContext";
 import { BiUserCircle } from "react-icons/bi";
 import axios from "../axios";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const { currentUser, setCurrentUser } = useUser();
@@ -33,7 +34,10 @@ export default function Header() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link as={Link} to="/create-listing">
+              New Listing
+            </Nav.Link>
             <NavDropdown
               flip="true"
               align="end"
