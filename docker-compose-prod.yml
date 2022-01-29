@@ -12,8 +12,7 @@ services:
     build:
         context: ./api
     volumes:
-      - /app/node_modules
-      - ./api:/app
+      - ./api:/backend
     env_file:
       - ./api/dev.env
     ports:
@@ -23,7 +22,12 @@ services:
     build:
       context: ./client
     volumes:
-      - /app/node_modules
-      - ./client:/app
+      - node-modules:/frontend/node_modules
+      - ./client:/frontend
     ports:
       - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  node-modules:
