@@ -7,13 +7,11 @@ phases:
   build:
     commands:
       # Test Build (Dockerfile.dev)
-      #- echo Build started on `date`
-      #- echo Building Docker test image...
       #- docker build -t $IMAGE_REPO_NAME:$TEST_IMAGE_TAG -f Dockerfile.dev .
       #- docker run -e CI=true $IMAGE_REPO_NAME:$TEST_IMAGE_TAG npm run test
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker-compose --file=docker-compose-prod.yml build
+      - docker-compose --file=docker-compose-prod.yml build 
   post_build:
     commands:
       - echo Build completed on `date`
