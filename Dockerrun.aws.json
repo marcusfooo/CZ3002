@@ -1,0 +1,33 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "client",
+      "image": "635728122877.dkr.ecr.ap-southeast-1.amazonaws.com/cz2006-client",
+      "hostname": "client",
+      "essential": false,
+      "memory": 256
+    },
+    {
+      "name": "api",
+      "image": "635728122877.dkr.ecr.ap-southeast-1.amazonaws.com/cz2006-api",
+      "hostname": "api",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "nginx",
+      "image": "635728122877.dkr.ecr.ap-southeast-1.amazonaws.com/cz2006-nginx",
+      "hostname": "nginx",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["client", "api"],
+      "memory": 64
+    }
+  ]
+}
