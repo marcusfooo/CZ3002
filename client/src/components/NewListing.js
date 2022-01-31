@@ -9,16 +9,36 @@ import { AiFillDelete } from "react-icons/ai";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const listingSchema = yup
   .object({
-    isRental: yup.boolean().required(),
-    postalCode: yup.string().matches(/\d{6}/).required(),
+    isRental: yup
+      .string()
+      .matches(/(renting|selling)/, { message: "Please select one" })
+      .required(),
+    postalCode: yup
+      .string()
+      .matches(/\d{6}/, "Invalid Singapore postal code")
+      .required(),
     location: yup.string().required(),
-    isRoom: yup.boolean().required(),
+    isRoom: yup
+      .string()
+      .required()
+      .matches(/(room|unit)/),
     description: yup.string().max(500),
-    price: yup.number().integer().required(),
-    numRooms: yup.number().integer().lessThan(6).moreThan(0).required(),
+    price: yup
+      .number()
+      .typeError("Please enter a valid number")
+      .integer()
+      .required(),
+    numRooms: yup
+      .number()
+      .typeError("Please choose one")
+      .integer()
+      .lessThan(6)
+      .moreThan(0)
+      .required(),
 
     seller_id: yup.number().required(),
   })
@@ -33,7 +53,7 @@ export default function NewListing() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({ resolver: yupResolver(listingSchema) });
   const watchListingType = watch("isRental");
 
   const postListing = (data) => {
@@ -46,8 +66,6 @@ export default function NewListing() {
       ...data,
       location: location,
     };
-    //validate the schema
-    listingSchema.validate();
   };
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -132,7 +150,7 @@ export default function NewListing() {
         <Col>
           <Card>
             <Card.Body>
-              <form onSubmit={handleSubmit(postListing)}>
+              <form noValidate onSubmit={handleSubmit(postListing)}>
                 <div className="form-group">
                   <label htmlFor="listingType">Listing Type</label>
                   <select
@@ -145,16 +163,18 @@ export default function NewListing() {
                     <option value="renting">Renting</option>
                     <option value="selling">Selling</option>
                   </select>
+                  <p className="text-danger">{errors.isRental?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <label htmlFor="postalCode">Postal Code</label>
                   <input
                     id="postalCode"
-                    type="number"
+                    type="text"
                     className="form-control"
                     {...register("postalCode")}
                     required
                   />
+                  <p className="text-danger">{errors.postalCode?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <div className="form-check form-check-inline">
@@ -204,6 +224,7 @@ export default function NewListing() {
                     <option value={1}>1</option>
                     <option value={2}>2</option>
                   </select>
+                  <p className="text-danger">{errors.numRooms?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <label htmlFor="price">Price</label>
@@ -214,6 +235,7 @@ export default function NewListing() {
                     className="form-control"
                     required
                   />
+                  <p className="text-danger">{errors.price?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <label htmlFor="description">Description</label>
@@ -224,7 +246,11 @@ export default function NewListing() {
                     className="form-control"
                     rows={3}
                   />
+                  <p className="text-danger">{errors.description?.message}</p>
                 </div>
+                <Button className="mt-3" type="submit">
+                  Create new listing
+                </Button>
               </form>
             </Card.Body>
           </Card>
