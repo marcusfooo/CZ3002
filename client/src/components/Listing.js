@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import { useParams } from "react-router-dom";
+import axios from "../axios";
 
 const exampleData = {
   title: "Luxurious studio in CBD",
@@ -15,6 +17,16 @@ const exampleData = {
 };
 
 export default function Listing() {
+  const { listingId } = useParams();
+
+  useEffect(() => {
+    async function getListingData() {
+      const res = await axios.get(`/api/listing/${listingId}`);
+      console.log(res);
+    }
+    getListingData();
+  }, [listingId]);
+
   return (
     <Container>
       <Row>

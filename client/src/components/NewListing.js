@@ -10,9 +10,13 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "../axios";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 const listingSchema = yup
   .object({
+    title: yup.string(100).required(),
     isRental: yup
       .string()
       .matches(/(renting|selling)/, { message: "Please select one" })
@@ -21,7 +25,6 @@ const listingSchema = yup
       .string()
       .matches(/\d{6}/, "Invalid Singapore postal code")
       .required(),
-    location: yup.string().required(),
     isRoom: yup
       .string()
       .required()
@@ -39,8 +42,6 @@ const listingSchema = yup
       .lessThan(6)
       .moreThan(0)
       .required(),
-
-    seller_id: yup.number().required(),
   })
   .required();
 
@@ -55,8 +56,10 @@ export default function NewListing() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(listingSchema) });
   const watchListingType = watch("isRental");
+  const navigate = useNavigate();
+  const { currentUser } = useUser();
 
-  const postListing = (data) => {
+  const postListing = async (data) => {
     console.log(data);
     data.isRental = data.isRental === "renting" ? true : false;
     data.isRoom = data.isRoom === "room" ? true : false;
@@ -65,7 +68,17 @@ export default function NewListing() {
     const finalData = {
       ...data,
       location: location,
+      seller_id: currentUser.id,
     };
+    console.log(finalData);
+    try {
+      const res = await axios.post("/api/listing", finalData, {
+        withCredentials: true,
+      });
+      navigate(`/listing/${res.data.id}`);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -151,6 +164,18 @@ export default function NewListing() {
           <Card>
             <Card.Body>
               <form noValidate onSubmit={handleSubmit(postListing)}>
+                <div className="form-group">
+                  <label htmlFor="postalCode">Title</label>
+                  <input
+                    id="title"
+                    type="text"
+                    className="form-control"
+                    {...register("title")}
+                    placeholder="Enter a title"
+                    required
+                  />
+                  <p className="text-danger">{errors.postalCode?.message}</p>
+                </div>
                 <div className="form-group">
                   <label htmlFor="listingType">Listing Type</label>
                   <select

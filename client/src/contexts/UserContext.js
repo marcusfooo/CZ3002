@@ -18,7 +18,7 @@ export function UserProvider({ children }) {
         const res = await axios.get("/api/user", {
           withCredentials: true,
         });
-        setCurrentUser({ email: res.data.email });
+        setCurrentUser({ id: res.data.id, email: res.data.email });
         setLoading(false);
       } catch (err) {
         setCurrentUser();

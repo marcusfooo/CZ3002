@@ -4,8 +4,10 @@ from flask_cors import CORS
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_marshmallow import Marshmallow
 
 db = SQLAlchemy()
+ma = Marshmallow()
 
 
 def create_app():
@@ -26,6 +28,7 @@ def create_app():
         return response
 
     db.init_app(app)
+    ma.init_app(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)

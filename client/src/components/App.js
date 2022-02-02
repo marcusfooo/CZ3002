@@ -15,7 +15,7 @@ export default function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/listing" element={<Listing />} />
+            <Route path="/listing/:listingId" element={<Listing />} />
             <Route path="/create-listing" element={<NewListing />} />
           </Routes>
         </BrowserRouter>
