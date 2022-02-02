@@ -7,6 +7,7 @@ from flask_login import LoginManager
 
 db = SQLAlchemy()
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -18,8 +19,10 @@ def create_app():
 
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
     db.init_app(app)
@@ -41,5 +44,8 @@ def create_app():
     # blueprint for non-auth parts of app
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint, url_prefix="/api")
+
+    from .listing import listing as listing_blueprint
+    app.register_blueprint(listing_blueprint, url_prefix="/api")
 
     return app
