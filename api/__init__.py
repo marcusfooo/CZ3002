@@ -51,4 +51,7 @@ def create_app():
     from .listing import listing as listing_blueprint
     app.register_blueprint(listing_blueprint, url_prefix="/api")
 
+    from .images import images as images_blueprint
+    app.register_blueprint(images_blueprint, url_prefix="/api")
+
     return app

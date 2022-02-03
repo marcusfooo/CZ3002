@@ -24,7 +24,7 @@ export default function Header() {
   return (
     <Navbar bg="primary" expand="sm" className="px-3">
       <Container fluid>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="/">
           <img
             src="/rentsg.png"
             style={{ objectFit: "contain", width: "100%", height: "30px" }}

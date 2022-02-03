@@ -27,6 +27,7 @@
   border-radius: 10vw;
   margin: 0 auto;
   padding: 1em;
+  max-width: 960px;
 }
 
 .form-container .form-control {
@@ -57,4 +58,8 @@
   padding: 0.75em 1em;
   margin-right: 1em;
   border-radius: 50%;
+}
+
+.searchForm {
+  margin-top: 5em;
 }

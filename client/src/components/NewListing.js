@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
-import ImageUploading from "react-images-uploading";
 import Container from "react-bootstrap/Container";
 import "../styles/NewListing.css";
 import Button from "react-bootstrap/Button";
-import { AiFillDelete } from "react-icons/ai";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
@@ -13,14 +11,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "../axios";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
+import ImageUploading from "react-images-uploading";
+import { AiFillDelete } from "react-icons/ai";
 
 const listingSchema = yup
   .object({
     title: yup.string(100).required(),
-    isRental: yup
-      .string()
-      .matches(/(renting|selling)/, { message: "Please select one" })
-      .required(),
     postalCode: yup
       .string()
       .matches(/\d{6}/, "Invalid Singapore postal code")
@@ -46,22 +42,24 @@ const listingSchema = yup
   .required();
 
 export default function NewListing() {
-  const [images, setImages] = useState([]);
-  const maxImageNumber = 69;
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm({ resolver: yupResolver(listingSchema) });
-  const watchListingType = watch("isRental");
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const [images, setImages] = useState([]);
+  const maxImageNumber = 69;
+
+  const onChange = (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setImages(imageList);
+  };
 
   const postListing = async (data) => {
     console.log(data);
-    data.isRental = data.isRental === "renting" ? true : false;
     data.isRoom = data.isRoom === "room" ? true : false;
     //TODO
     const location = "somelocation";
@@ -81,17 +79,22 @@ export default function NewListing() {
     }
   };
 
-  const onChange = (imageList, addUpdateIndex) => {
-    // data for submit
-    console.log(imageList, addUpdateIndex);
-    setImages(imageList);
+  const uploadImages = async () => {
+    let promises = [];
+    images.map((image) => {
+      promises.push(uploadToS3(image));
+    });
+    const res = await Promise.all(promises);
+    console.log(res);
   };
 
-  useEffect(() => {
-    if (watchListingType === "selling") {
-      setValue("isRoom", "unit");
-    }
-  }, [watchListingType, setValue]);
+  const uploadToS3 = async (image) => {
+    const formData = new FormData();
+    formData.append("image", image.file);
+    axios.put("/api/images", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  };
 
   return (
     <Container className="mt-3">
@@ -100,7 +103,9 @@ export default function NewListing() {
         <Col>
           <Card>
             <Card.Body>
+              <Button onClick={uploadImages}>Upload</Button>
               <ImageUploading
+                inputProps={{ name: "files" }}
                 multiple
                 value={images}
                 onChange={onChange}
@@ -176,32 +181,13 @@ export default function NewListing() {
                   />
                   <p className="text-danger">{errors.postalCode?.message}</p>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="listingType">Listing Type</label>
-                  <select
-                    {...register("isRental")}
-                    className="form-select"
-                    id="listingType"
-                    required
+                <div className="form-group mt-3">
+                  <label
+                    className="form-check-inline"
+                    htmlFor="flexRadioDefault1"
                   >
-                    <option value="">Are you renting or selling?</option>
-                    <option value="renting">Renting</option>
-                    <option value="selling">Selling</option>
-                  </select>
-                  <p className="text-danger">{errors.isRental?.message}</p>
-                </div>
-                <div className="form-group mt-3">
-                  <label htmlFor="postalCode">Postal Code</label>
-                  <input
-                    id="postalCode"
-                    type="text"
-                    className="form-control"
-                    {...register("postalCode")}
-                    required
-                  />
-                  <p className="text-danger">{errors.postalCode?.message}</p>
-                </div>
-                <div className="form-group mt-3">
+                    Listing Type
+                  </label>
                   <div className="form-check form-check-inline">
                     <input
                       className="form-check-input"
@@ -209,7 +195,6 @@ export default function NewListing() {
                       id="flexRadioDefault1"
                       value="room"
                       name="isRoom"
-                      disabled={watchListingType === "selling"}
                       {...register("isRoom")}
                     />
                     <label
@@ -235,6 +220,17 @@ export default function NewListing() {
                       Whole unit
                     </label>
                   </div>
+                </div>
+                <div className="form-group mt-3">
+                  <label htmlFor="postalCode">Postal Code</label>
+                  <input
+                    id="postalCode"
+                    type="text"
+                    className="form-control"
+                    {...register("postalCode")}
+                    required
+                  />
+                  <p className="text-danger">{errors.postalCode?.message}</p>
                 </div>
 
                 <div className="form-group mt-3">

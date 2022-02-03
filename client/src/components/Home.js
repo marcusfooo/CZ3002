@@ -13,8 +13,7 @@ export default function Home() {
   return (
     <div className="home">
       <div className="bg"></div>
-      <ApiTest />
-      <Form>
+      <Form className="searchForm">
         <Container fluid="sm" className="form-container">
           <Row>
             <Col sm>
@@ -40,7 +39,7 @@ export default function Home() {
           </Row>
         </Container>
       </Form>
-      <h3 className="text-center text-white mt-3">Finding a home made easy</h3>
+      <h1 className="text-center text-white mt-5">Finding a home made easy</h1>
     </div>
   );
 }
