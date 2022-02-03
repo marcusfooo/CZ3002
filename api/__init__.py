@@ -1,4 +1,3 @@
-import logging
 from flask import Flask
 from flask_cors import CORS
 from datetime import timedelta
@@ -33,7 +32,7 @@ def create_app():
     login_manager = LoginManager()
     login_manager.init_app(app)
 
-    from .models import User
+    from .models.user import User
 
     @login_manager.user_loader
     def load_user(user_id):

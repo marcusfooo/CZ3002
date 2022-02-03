@@ -1,15 +1,5 @@
-from flask_login import UserMixin
-from . import db
+from api import db
 from datetime import datetime
-from . import ma
-
-
-class User(UserMixin, db.Model):
-    # primary keys are required by SQLAlchemy
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
-    listings = db.relationship("Listing", backref="user")
 
 
 class Listing(db.Model):
@@ -25,8 +15,4 @@ class Listing(db.Model):
     created_at = db.Column(db.DateTime, nullable=False,
                            default=datetime.utcnow)
     seller_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
-
-class ListingSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Listing
+    images = db.relationship("ListingImage", backref="listing")

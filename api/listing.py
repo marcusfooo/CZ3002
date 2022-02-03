@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, make_response, request
 from flask_login import current_user, login_required
-from .models import Listing, ListingSchema
+from .models.listing import Listing
+from .schemas import ListingSchema
 from . import db
 
 listing = Blueprint('listing', __name__)

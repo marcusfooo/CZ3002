@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, make_response, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User
+from .models.user import User
 from flask_login import current_user, login_user, login_required, logout_user
 from . import db
 
@@ -53,7 +53,7 @@ def signup_post():
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
-    login_user(user)
+    login_user(new_user)
     response = make_response(jsonify({"message": "Signed up"}))
     return response
 

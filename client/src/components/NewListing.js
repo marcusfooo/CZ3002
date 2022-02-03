@@ -73,27 +73,31 @@ export default function NewListing() {
       const res = await axios.post("/api/listing", finalData, {
         withCredentials: true,
       });
+      await uploadImages(res.data.id);
       navigate(`/listing/${res.data.id}`);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const uploadImages = async () => {
+  const uploadImages = async (listingId) => {
     let promises = [];
-    images.map((image) => {
-      promises.push(uploadToS3(image));
+    images.forEach((image) => {
+      promises.push(uploadToS3(image, listingId));
     });
     const res = await Promise.all(promises);
     console.log(res);
   };
 
-  const uploadToS3 = async (image) => {
+  const uploadToS3 = async (image, listingId) => {
     const formData = new FormData();
     formData.append("image", image.file);
-    axios.put("/api/images", formData, {
+    formData.append("listing_id", listingId);
+    const res = await axios.put("/api/images", formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      withCredentials: true,
     });
+    return res;
   };
 
   return (

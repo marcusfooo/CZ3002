@@ -1,12 +1,11 @@
-import io
 import os
+import secrets
 import boto3
 from dotenv import load_dotenv
 from flask import Blueprint, jsonify, make_response, request
-from flask_login import current_user, login_required
-from .models import Listing, ListingSchema
+from flask_login import login_required
+from .models.listingimage import ListingImage
 from . import db
-from werkzeug.utils import secure_filename
 
 images = Blueprint('images', __name__)
 
@@ -18,9 +17,11 @@ load_dotenv(os.path.join(BASEDIR, '.env'))
 
 
 @images.route("/images", methods=["PUT"])
+@login_required
 def upload_image():
     file = request.files["image"]
-    filename = secure_filename(file.filename)
+    filename = secrets.token_hex(16)
+    listing_id = request.form.get("listing_id")
     s3 = boto3.client(
         "s3",
         aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -31,15 +32,19 @@ def upload_image():
         s3.upload_fileobj(
             file,
             bucket,
-            file.filename,
+            filename,
             ExtraArgs={
                 "ACL": "public-read",
                 "ContentType": file.content_type
             }
         )
+        new_image = ListingImage(listing_id=listing_id, file_name=filename)
+        db.session.add(new_image)
+        db.session.commit()
 
     except Exception as e:
         # This is a catch all exception, edit this part to fit your needs.
         print("Something Happened: ", e)
-        return e
+        return make_response(jsonify({"error": e}), 500)
+
     return make_response(jsonify({"message": filename}), 200)
