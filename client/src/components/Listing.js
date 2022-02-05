@@ -44,10 +44,9 @@ export default function Listing() {
         <Container>
           <div className="photo-grid">
             {images.map((image, idx) => (
-              <div className="photo-card">
+              <div className="shadow-sm photo-card">
                 <Image
                   rounded
-                  className="photo-card"
                   key={idx}
                   src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${image}`}
                 />
@@ -71,7 +70,7 @@ export default function Listing() {
         <Col>
           <Card>
             <Card.Body>
-              {listingData.seller}
+              {listingData.seller.email}
               <Button>Chat now</Button>
             </Card.Body>
           </Card>
