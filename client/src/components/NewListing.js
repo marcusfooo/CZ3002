@@ -9,10 +9,13 @@ import { useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "../axios";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import ImageUploading from "react-images-uploading";
 import { AiFillDelete } from "react-icons/ai";
+import { GrUpdate } from "react-icons/gr";
+import Tooltip from "react-bootstrap/Tooltip";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 const listingSchema = yup
   .object({
@@ -50,7 +53,7 @@ export default function NewListing() {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const [images, setImages] = useState([]);
-  const maxImageNumber = 69;
+  const maxImageNumber = 5;
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
@@ -100,6 +103,11 @@ export default function NewListing() {
     return res;
   };
 
+  //redirect user to homepage if not auth
+  if (!currentUser) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <Container className="mt-3">
       <h3>What are you listing?</h3>
@@ -107,7 +115,6 @@ export default function NewListing() {
         <Col>
           <Card>
             <Card.Body>
-              <Button onClick={uploadImages}>Upload</Button>
               <ImageUploading
                 inputProps={{ name: "files" }}
                 multiple
@@ -115,6 +122,7 @@ export default function NewListing() {
                 onChange={onChange}
                 maxNumber={maxImageNumber}
                 dataURLKey="data_url"
+                acceptType={["jpg", "png"]}
               >
                 {({
                   imageList,
@@ -124,6 +132,7 @@ export default function NewListing() {
                   onImageRemove,
                   isDragging,
                   dragProps,
+                  errors,
                 }) => (
                   // write your building UI
                   <div>
@@ -138,7 +147,18 @@ export default function NewListing() {
                         Click or Drop here
                       </Button>
                     </div>
-                    &nbsp;
+                    {errors && (
+                      <div className="text-danger">
+                        {errors.maxNumber && (
+                          <span>
+                            Number of selected images exceed maximum (5)
+                          </span>
+                        )}
+                        {errors.acceptType && (
+                          <span>Your selected file type is not allowed</span>
+                        )}
+                      </div>
+                    )}
                     <Button
                       className="mt-2"
                       variant="secondary"
@@ -146,23 +166,35 @@ export default function NewListing() {
                     >
                       Remove all images
                     </Button>
-                    {imageList.map((image, index) => (
-                      <div key={index} className="image-item">
-                        <img src={image["data_url"]} alt="" width="100" />
-                        <div className="image-item__btn-wrapper">
-                          <button onClick={() => onImageUpdate(index)}>
-                            Update
-                          </button>
-                          <Button
-                            variant="light"
-                            className="mt-2"
-                            onClick={() => onImageRemove(index)}
-                          >
-                            <AiFillDelete size={"1.5em"} />
-                          </Button>
+                    <div className="imageGrid">
+                      {imageList.map((image, index) => (
+                        <div key={index} className="image-item">
+                          <img src={image["data_url"]} alt="" width="100" />
+                          <div className="d-flex justify-content-between">
+                            <OverlayTrigger overlay={<Tooltip>Update</Tooltip>}>
+                              <Button
+                                variant="light"
+                                className="mt-2 p-0"
+                                onClick={() => onImageUpdate(index)}
+                              >
+                                <GrUpdate size={"1.25em"} />
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger
+                              overlay={<Tooltip>Delete image</Tooltip>}
+                            >
+                              <Button
+                                variant="light"
+                                className="mt-2 p-0"
+                                onClick={() => onImageRemove(index)}
+                              >
+                                <AiFillDelete color="#7C0A02" size={"1.5em"} />
+                              </Button>
+                            </OverlayTrigger>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
               </ImageUploading>

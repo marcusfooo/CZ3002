@@ -8,3 +8,12 @@
   padding: 2em;
   transition: all 300ms ease;
 }
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.image-item {
+  width: 100px;
+}

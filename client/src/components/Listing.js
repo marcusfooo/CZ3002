@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/Row";
@@ -6,51 +6,72 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { useParams } from "react-router-dom";
 import axios from "../axios";
-
-const exampleData = {
-  title: "Luxurious studio in CBD",
-  location: "Queenstown, Singapore",
-  description:
-    "The property is located at Queenstown, just a 5 minutes drive away from the Central Business District (CBD), making it perfect for office workers or expats. Minimum 3 months",
-  price: 1900,
-  seller: "user019273",
-};
+import Image from "react-bootstrap/Image";
+import "../styles/Listing.css";
 
 export default function Listing() {
   const { listingId } = useParams();
+  const [listingData, setListingData] = useState();
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getListingData() {
+      setLoading(true);
       const res = await axios.get(`/api/listing/${listingId}`);
+      const filenames = await axios.get(`/api/images/${listingId}`);
       console.log(res);
+      setImages(filenames.data.data);
+      setListingData(res.data.listing);
+      setLoading(false);
     }
     getListingData();
   }, [listingId]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Container>
-      <Row>
-        <h3>{exampleData.title}</h3>
+      <Row className="mt-3">
+        <h3>{listingData.title}</h3>
       </Row>
       <Row>
-        <p>{exampleData.location}</p>
+        <p>{listingData.location}</p>
       </Row>
-      <Row>
+      <Row className="mt-3">
+        <Container>
+          <div className="photo-grid">
+            {images.map((image, idx) => (
+              <div className="photo-card">
+                <Image
+                  rounded
+                  className="photo-card"
+                  key={idx}
+                  src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${image}`}
+                />
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Row>
+      <Row className="mt-3">
         <Col>
           <Row>
             <Col>
               <h4>Description</h4>
-              <p>{exampleData.description}</p>
+              <p>{listingData.description}</p>
             </Col>
             <Col>
-              <h4>${exampleData.price} SGD/month</h4>
+              <h5>${listingData.price} SGD/mo</h5>
             </Col>
           </Row>
         </Col>
         <Col>
           <Card>
             <Card.Body>
-              {exampleData.seller}
+              {listingData.seller}
               <Button>Chat now</Button>
             </Card.Body>
           </Card>

@@ -35,9 +35,11 @@ export default function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/create-listing">
-              New Listing
-            </Nav.Link>
+            {currentUser && (
+              <Nav.Link as={Link} to="/create-listing">
+                New Listing
+              </Nav.Link>
+            )}
             <NavDropdown
               flip="true"
               align="end"

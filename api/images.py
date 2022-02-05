@@ -1,3 +1,4 @@
+from fileinput import filename
 import os
 import secrets
 import boto3
@@ -16,11 +17,22 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
 
+@images.route("/images/<int:listing_id>", methods=["GET"])
+def get_images(listing_id):
+    # get file names from DB
+    images = ListingImage.query.filter_by(listing_id=listing_id).all()
+    filenames = []
+    for image in images:
+        filenames.append(image.file_name)
+
+    return make_response(jsonify({"data": filenames}), 200)
+
+
 @images.route("/images", methods=["PUT"])
 @login_required
 def upload_image():
     file = request.files["image"]
-    filename = secrets.token_hex(16)
+    filename = secrets.token_hex(8)
     listing_id = request.form.get("listing_id")
     s3 = boto3.client(
         "s3",

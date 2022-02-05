@@ -1,9 +1,14 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
+from dotenv import load_dotenv
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(BASEDIR, '.env'))
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -15,7 +20,14 @@ def create_app():
     app.config["APPLICATION_ROOT"] = "/api"
     CORS(app, supports_credentials=True)
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    db_username = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_endpoint = os.getenv("DB_ENDPOINT")
+    db_name = os.getenv("DB_NAME")
+    db_url = f'mysql+pymysql://{db_username}:{db_password}@{db_endpoint}:3306/{db_name}'
+    # print("THE URL IS:", db_url)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     @app.after_request
