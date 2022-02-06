@@ -7,4 +7,4 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
-    listings = db.relationship("Listing", backref="user")
+    listings = db.relationship("Listing", back_populates="seller")

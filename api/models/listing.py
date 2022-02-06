@@ -15,5 +15,6 @@ class Listing(db.Model):
     created_at = db.Column(db.DateTime, nullable=False,
                            default=datetime.utcnow)
     seller_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    seller = db.relationship("User", backref=db.backref("user"))
+    seller = db.relationship(
+        "User", back_populates="listings")
     images = db.relationship("ListingImage", backref="listing")

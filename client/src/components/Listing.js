@@ -33,17 +33,29 @@ export default function Listing() {
     getListingData();
   }, [listingId]);
 
-  function createDirectChat() {
+  async function createDirectChat() {
     const creds = {
-      publicKey: publicKey,
-      userName: currentUser.email,
-      userSecret: currentUser.password,
+      "Public-Key": publicKey,
+      "User-Name": currentUser.email,
+      "User-Secret": currentUser.password,
+      "Content-Type": "application/json",
     };
-    getOrCreateChat(creds, {
-      is_direct_chat: true,
-      usernames: [listingData.seller.email],
+    const res = await fetch("https://api.chatengine.io/chats/", {
+      method: "PUT",
+      body: JSON.stringify({
+        is_direct_chat: true,
+        usernames: [listingData.seller.email],
+      }),
+      headers: creds,
     });
-    navigate("/chat");
+    const data = await res.json();
+    const chatId = data.id;
+
+    // getOrCreateChat(creds, {
+    //   is_direct_chat: true,
+    //   usernames: [listingData.seller.email],
+    // });
+    navigate(`/chat/${chatId}`);
   }
 
   if (loading) {

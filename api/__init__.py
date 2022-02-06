@@ -28,6 +28,11 @@ def create_app():
     db_url = f'mysql+pymysql://{db_username}:{db_password}@{db_endpoint}:3306/{db_name}'
     # print("THE URL IS:", db_url)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+
+    # configurations to prevent lost connection to MySQL
+    app.config["SQLALCHEMY_PRE_PING"] = True
+    app.config["SQLALCHEMY_POOL_RECYCLE"] = 3600
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     @app.after_request

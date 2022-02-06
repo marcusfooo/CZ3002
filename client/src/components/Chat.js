@@ -1,11 +1,24 @@
-import React from "react";
-import { ChatEngine, getOrCreateChat } from "react-chat-engine";
-import { Navigate } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import {
+  ChatEngine,
+  ChatEngineContext,
+  getOrCreateChat,
+} from "react-chat-engine";
+import { Navigate, useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import "../styles/Chat.css";
+import MyChatCard from "./MyChatCard";
 
 export default function Chat() {
   const { currentUser } = useUser();
+  const { chatId } = useParams();
+  const { setActiveChat } = useContext(ChatEngineContext);
+
+  useEffect(() => {
+    if (chatId) {
+      setActiveChat(chatId);
+    }
+  }, [chatId, setActiveChat]);
 
   if (!currentUser) {
     return <Navigate to="/" replace />;
@@ -18,6 +31,9 @@ export default function Chat() {
         userName={currentUser.email}
         userSecret={currentUser.password}
         renderChatSettings={(chatAppState) => null}
+        renderChatCard={(chat, index) => (
+          <MyChatCard chat={chat} index={`${index}`} />
+        )}
       />
     </div>
   );
