@@ -4,16 +4,21 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/Row";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../axios";
 import Image from "react-bootstrap/Image";
 import "../styles/Listing.css";
+import { getOrCreateChat } from "react-chat-engine";
+import { useUser } from "../contexts/UserContext";
+import { publicKey } from "../chatEngine";
 
 export default function Listing() {
   const { listingId } = useParams();
   const [listingData, setListingData] = useState();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getListingData() {
@@ -27,6 +32,19 @@ export default function Listing() {
     }
     getListingData();
   }, [listingId]);
+
+  function createDirectChat() {
+    const creds = {
+      publicKey: publicKey,
+      userName: currentUser.email,
+      userSecret: currentUser.password,
+    };
+    getOrCreateChat(creds, {
+      is_direct_chat: true,
+      usernames: [listingData.seller.email],
+    });
+    navigate("/chat");
+  }
 
   if (loading) {
     return <div>Loading...</div>;
@@ -44,10 +62,9 @@ export default function Listing() {
         <Container>
           <div className="photo-grid">
             {images.map((image, idx) => (
-              <div className="shadow-sm photo-card">
+              <div key={image} className="shadow-sm photo-card">
                 <Image
                   rounded
-                  key={idx}
                   src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${image}`}
                 />
               </div>
@@ -71,7 +88,7 @@ export default function Listing() {
           <Card>
             <Card.Body>
               {listingData.seller.email}
-              <Button>Chat now</Button>
+              <Button onClick={createDirectChat}>Chat now</Button>
             </Card.Body>
           </Card>
         </Col>

@@ -1,16 +1,25 @@
+import os
+from dotenv import load_dotenv
 from flask import Blueprint, jsonify, make_response, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models.user import User
 from flask_login import current_user, login_user, login_required, logout_user
 from . import db
+import requests
 
 auth = Blueprint('auth', __name__)
+
+# Get the path to the directory this file is in
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+# Connect the path with your '.env' file name
+load_dotenv(os.path.join(BASEDIR, '.env'))
 
 
 @auth.route("/user", methods=["GET"])
 @login_required
 def get_user():
-    return make_response(jsonify({"id": current_user.id, "email": current_user.email}))
+    return make_response(jsonify({"id": current_user.id, "email": current_user.email, "password": current_user.password}))
 
 
 @auth.route('/login', methods=['POST'])
@@ -47,13 +56,18 @@ def signup_post():
         return response
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    new_user = User(email=email, password=generate_password_hash(
-        password, method='sha256'))
+    password = generate_password_hash(
+        password, method='sha256')
+    new_user = User(email=email, password=password)
 
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
     login_user(new_user)
+    # create chatengine user
+    chat_response = requests.post('https://api.chatengine.io/users/', data={"username": email, "secret": password}, headers={
+        "PRIVATE-KEY": os.getenv("CHAT_ENGINE_PRIVATE_KEY")
+    })
     response = make_response(jsonify({"message": "Signed up"}))
     return response
 

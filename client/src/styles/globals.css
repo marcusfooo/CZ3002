@@ -9,6 +9,8 @@ body {
   width: 100%;
   --bg: #fafafa;
   --accent: #fad089;
+  --accentlight: #ffedcb;
+  --accentdark: #bf9a56;
 }
 
 #root,

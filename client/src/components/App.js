@@ -6,6 +6,7 @@ import { UserProvider } from "../contexts/UserContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NewListing from "./NewListing";
 import Listing from "./Listing";
+import Chat from "./Chat";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/listing/:listingId" element={<Listing />} />
             <Route path="/create-listing" element={<NewListing />} />
+            <Route path="/chat" element={<Chat />} />
           </Routes>
         </BrowserRouter>
       </div>
