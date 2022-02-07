@@ -15,6 +15,24 @@ def get_listing(listing_id):
     return make_response(jsonify({"listing": listing_schema.dump(listing)}), 200)
 
 
+@listing.route("/listing", methods=["GET"])
+def get_all_listings():
+    args = request.args
+    location = args.get("location")
+    type = args.get("type")
+    number = args.get("number")
+    listings = Listing.query
+    if location is not None:
+        listings.filter(location=location)
+    if type is not None:
+        listings.filter(isRoom=type)
+    if number is not None:
+        listings.filter(numRooms=number)
+
+    listing_schema = ListingSchema(many=True)
+    return make_response(jsonify({"listings": listing_schema.dump(listings.all())}), 200)
+
+
 @listing.route("/listing", methods=["POST"])
 @login_required
 def post_listing():
