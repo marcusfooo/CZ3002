@@ -17,4 +17,4 @@ class Listing(db.Model):
     seller_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     seller = db.relationship(
         "User", back_populates="listings")
-    images = db.relationship("ListingImage", backref="listing")
+    images = db.relationship("ListingImage", back_populates="listing")
