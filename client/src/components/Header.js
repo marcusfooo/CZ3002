@@ -8,6 +8,7 @@ import { useUser } from "../contexts/UserContext";
 import { BiUserCircle } from "react-icons/bi";
 import axios from "../axios";
 import { Link } from "react-router-dom";
+import "../styles/Header.css";
 
 export default function Header() {
   const { currentUser, setCurrentUser } = useUser();
@@ -22,7 +23,7 @@ export default function Header() {
   };
 
   return (
-    <Navbar bg="primary" expand="sm" className="px-3">
+    <Navbar className="header" bg="primary" expand="sm" className="px-3">
       <Container fluid>
         <Navbar.Brand href="/">
           <img

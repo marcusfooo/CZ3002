@@ -1,0 +1,28 @@
+.dashboard {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.list {
+  display: grid;
+  grid-auto-rows: 250px;
+  gap: 2em;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.list::-webkit-scrollbar {
+  width: 0.25em;
+}
+
+.list::-webkit-scrollbar-track {
+  background-color: hsl(204 8% 76%);
+  margin-block: 0.5em;
+  border-radius: 100vw;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background-color: hsl(204 8% 56%);
+  margin-block: 0.5em;
+  border-radius: 100vw;
+}
