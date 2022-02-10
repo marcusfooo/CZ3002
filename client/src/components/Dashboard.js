@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import ListingCard from "./ListingCard";
 import Row from "react-bootstrap/Row";
 import "../styles/Dashboard.css";
+import Map from "./Map";
 
 export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,7 +23,7 @@ export default function Dashboard() {
 
   return (
     <Container fluid className="dashboard">
-      <Row>
+      <Row className="filter-bar">
         <h5>Filters</h5>
       </Row>
       <Row>
@@ -31,7 +32,9 @@ export default function Dashboard() {
             <ListingCard {...listing} key={idx} />
           ))}
         </Col>
-        <Col>Map goes here</Col>
+        <Col className="p-0">
+          <Map />
+        </Col>
       </Row>
     </Container>
   );

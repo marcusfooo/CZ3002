@@ -18,10 +18,7 @@ export default function ListingCard({
 }) {
   const navigate = useNavigate();
   return (
-    <Container
-      role="button"
-      onClick={() => navigate({ pathname: `/listing/${id}` })}
-    >
+    <Container>
       <Row>
         <Col>
           <Carousel variant="dark" interval={null}>
@@ -36,7 +33,10 @@ export default function ListingCard({
             ))}
           </Carousel>
         </Col>
-        <Col>
+        <Col
+          role="button"
+          onClick={() => navigate({ pathname: `/listing/${id}` })}
+        >
           <Row className="h-100">
             <h5 className="p-0 m-0">{title}</h5>
             <span className="p-0">{location}</span>
