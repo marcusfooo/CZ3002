@@ -7,43 +7,17 @@ import ListingCard from "./ListingCard";
 import Row from "react-bootstrap/Row";
 import "../styles/Dashboard.css";
 import Map from "./Map";
-
-const getCoords = async (listing) => {
-  try {
-    const res = await fetch(
-      `https://developers.onemap.sg/commonapi/search?searchVal=${listing.postalCode}&returnGeom=Y&getAddrDetails=Y&pageNum=1`
-    );
-    const results = await res.json();
-    if (results.results.length > 0) {
-      return [
-        parseFloat(results.results[0]["LATITUDE"]),
-        parseFloat(results.results[0]["LONGITUDE"]),
-      ];
-    } else {
-      return;
-    }
-  } catch (err) {
-    console.error("Failed to fetch coordinates");
-  }
-};
+import DoubleSlider from "./DoubleSlider";
+import Dropdown from "react-bootstrap/Dropdown";
 
 export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [listings, setListings] = useState([]);
-  const [coords, setCoords] = useState([]);
 
   useEffect(() => {
     async function getListings() {
-      const res = await axios.get("/api/listing", searchParams);
-      console.log(res);
+      const res = await axios.get("/api/listing?" + searchParams);
       setListings(res.data.listings);
-      const coords = await Promise.all(
-        res.data.listings.map(async (listing) => {
-          const res = await getCoords(listing);
-          return res;
-        })
-      );
-      setCoords(coords.filter(Boolean));
     }
     getListings();
   }, [searchParams]);
@@ -51,16 +25,29 @@ export default function Dashboard() {
   return (
     <Container fluid className="dashboard">
       <Row className="filter-bar">
-        <h5>Filters</h5>
+        <Dropdown>
+          <Dropdown.Toggle className="toggle">Filters</Dropdown.Toggle>
+          <Dropdown.Menu>
+            <DoubleSlider
+              searchParams={searchParams}
+              setSearchParams={setSearchParams}
+              min={100}
+              max={3000}
+            />
+          </Dropdown.Menu>
+        </Dropdown>
       </Row>
-      <Row className="h-100">
+      <Row className="dashboard-main">
         <Col sm={7} className="list">
+          {listings.length === 0 && (
+            <div className="text-center">No listings found.</div>
+          )}
           {listings.map((listing, idx) => (
             <ListingCard {...listing} key={idx} />
           ))}
         </Col>
         <Col className="p-0">
-          <Map coords={coords} listings={listings} />
+          <Map listings={listings} />
         </Col>
       </Row>
     </Container>

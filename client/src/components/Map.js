@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import ReactDOMServer from "react-dom/server";
@@ -14,8 +14,41 @@ function customIcon(price) {
   });
 }
 
-export default function SGMap({ coords, listings }) {
-  console.log(listings);
+const getCoords = async (listing) => {
+  try {
+    const res = await fetch(
+      `https://developers.onemap.sg/commonapi/search?searchVal=${listing.postalCode}&returnGeom=Y&getAddrDetails=Y&pageNum=1`
+    );
+    const results = await res.json();
+    if (results.results.length > 0) {
+      return [
+        parseFloat(results.results[0]["LATITUDE"]),
+        parseFloat(results.results[0]["LONGITUDE"]),
+      ];
+    } else {
+      return;
+    }
+  } catch (err) {
+    console.error("Failed to fetch coordinates");
+  }
+};
+
+export default function Map({ listings }) {
+  const [coords, setCoords] = useState([]);
+
+  useEffect(() => {
+    async function coordsWrapper() {
+      const res = await Promise.all(
+        listings.map(async (listing) => {
+          const res = await getCoords(listing);
+          return res;
+        })
+      );
+      setCoords(res.filter(Boolean));
+    }
+    coordsWrapper();
+  }, [listings]);
+
   return (
     <MapContainer
       center={[1.360278, 103.8083]}
@@ -34,7 +67,7 @@ export default function SGMap({ coords, listings }) {
         <Marker
           key={idx}
           position={coord}
-          icon={customIcon(listings[idx].price)}
+          icon={customIcon(listings[idx]?.price)}
         >
           <Popup>
             A pretty CSS3 popup. <br /> Easily customizable.

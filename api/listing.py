@@ -23,14 +23,19 @@ def get_all_listings():
     location = args.get("location")
     type = args.get("type")
     number = args.get("number")
+    minPrice = args.get("minPrice")
+    maxPrice = args.get("maxPrice")
     listings = Listing.query
-    if location is not None:
-        listings.filter(location=location)
-    if type is not None:
-        listings.filter(isRoom=type)
-    if number is not None:
-        listings.filter(numRooms=number)
-
+    if location is not None and location != "":
+        listings = listings.filter(Listing.location == location)
+    if type is not None and type != "":
+        listings = listings.filter(Listing.isRoom == type)
+    if number is not None and number != "":
+        listings = listings.filter(Listing.numRooms == number)
+    if minPrice is not None and minPrice != "":
+        listings = listings.filter(Listing.price >= minPrice)
+    if maxPrice is not None and maxPrice != " ":
+        listings = listings.filter(Listing.price <= maxPrice)
     listing_schema = ListingSchema(many=True)
     return make_response(jsonify({"listings": listing_schema.dump(listings.all())}), 200)
 

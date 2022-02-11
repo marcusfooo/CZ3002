@@ -8,7 +8,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "../axios";
 import Image from "react-bootstrap/Image";
 import "../styles/Listing.css";
-import { getOrCreateChat } from "react-chat-engine";
 import { useUser } from "../contexts/UserContext";
 import { publicKey } from "../chatEngine";
 

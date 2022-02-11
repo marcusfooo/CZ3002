@@ -1,9 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import {
-  ChatEngine,
-  ChatEngineContext,
-  getOrCreateChat,
-} from "react-chat-engine";
+import { ChatEngine, ChatEngineContext } from "react-chat-engine";
 import { Navigate, useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import "../styles/Chat.css";

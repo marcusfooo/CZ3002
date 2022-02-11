@@ -23,7 +23,7 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="header" bg="primary" expand="sm" className="px-3">
+    <Navbar className="header px-3" bg="primary" expand="sm">
       <Container fluid>
         <Navbar.Brand href="/">
           <img
