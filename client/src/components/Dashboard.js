@@ -60,7 +60,7 @@ export default function Dashboard() {
           ))}
         </Col>
         <Col className="p-0">
-          <Map coords={coords} />
+          <Map coords={coords} listings={listings} />
         </Col>
       </Row>
     </Container>
