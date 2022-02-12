@@ -70,7 +70,7 @@ export default function FilterForm() {
     <Form className="searchForm" onSubmit={handleSubmit(onSearch)}>
       <Container fluid="lg" className="form-container">
         <Row>
-          <Col sm={4} className="field">
+          <Col md={5} sm={4} className="field">
             <Controller
               control={control}
               name="location"
@@ -89,7 +89,7 @@ export default function FilterForm() {
               )}
             />
           </Col>
-          <Col sm={3} className="field">
+          <Col md={3} sm={3} className="field">
             <Controller
               control={control}
               name="type"
@@ -107,7 +107,7 @@ export default function FilterForm() {
               )}
             />
           </Col>
-          <Col sm={3} className="field">
+          <Col md={3} sm={3} className="field">
             <Controller
               control={control}
               name="number"
@@ -127,6 +127,7 @@ export default function FilterForm() {
           </Col>
           <Col
             sm={2}
+            md={1}
             className="d-flex p-0 justify-content-end align-items-center"
           >
             <Button type="submit" className="search-button">

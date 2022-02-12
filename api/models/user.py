@@ -8,3 +8,4 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     listings = db.relationship("Listing", back_populates="seller")
+    bids = db.relationship("Bid", back_populates="bidder")

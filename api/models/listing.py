@@ -18,3 +18,4 @@ class Listing(db.Model):
     seller = db.relationship(
         "User", back_populates="listings")
     images = db.relationship("ListingImage", back_populates="listing")
+    bids = db.relationship("Bid", back_populates="listing")

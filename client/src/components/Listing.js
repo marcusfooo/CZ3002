@@ -10,6 +10,7 @@ import Image from "react-bootstrap/Image";
 import "../styles/Listing.css";
 import { useUser } from "../contexts/UserContext";
 import { publicKey } from "../chatEngine";
+import Form from "react-bootstrap/Form";
 
 export default function Listing() {
   const { listingId } = useParams();
@@ -50,10 +51,6 @@ export default function Listing() {
     const data = await res.json();
     const chatId = data.id;
 
-    // getOrCreateChat(creds, {
-    //   is_direct_chat: true,
-    //   usernames: [listingData.seller.email],
-    // });
     navigate(`/chat/${chatId}`);
   }
 
@@ -84,7 +81,7 @@ export default function Listing() {
         </Container>
       </Row>
       <Row className="mt-3">
-        <Col>
+        <Col sm={8}>
           <Row>
             <Col>
               <h4>Description</h4>
@@ -98,8 +95,18 @@ export default function Listing() {
         <Col>
           <Card>
             <Card.Body>
-              {listingData.seller.email}
-              <Button onClick={createDirectChat}>Chat now</Button>
+              <p>{listingData.seller.email}</p>
+              <Button
+                className="w-100 mb-2"
+                variant="secondary"
+                onClick={createDirectChat}
+              >
+                Chat now
+              </Button>
+              <Form.Control type="number" placeholder="Enter a bid eg. 1000" />
+              <Button className="w-100 mt-2" onClick={createDirectChat}>
+                Place Bid
+              </Button>
             </Card.Body>
           </Card>
         </Col>

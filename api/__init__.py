@@ -70,4 +70,7 @@ def create_app():
     from .images import images as images_blueprint
     app.register_blueprint(images_blueprint, url_prefix="/api")
 
+    from .bid import bid as bid_blueprint
+    app.register_blueprint(bid_blueprint, url_prefix="/api")
+
     return app
