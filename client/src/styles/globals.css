@@ -9,6 +9,8 @@ body {
   width: 100%;
   --bg: #fafafa;
   --accent: #fad089;
+  --accentlight: #ffedcb;
+  --accentdark: #bf9a56;
 }
 
 #root,
@@ -24,4 +26,10 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

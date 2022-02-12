@@ -79,7 +79,7 @@ export default function LoginModal() {
   return (
     <>
       <NavDropdown.Item variant="primary" onClick={handleShow}>
-        Login
+        Login/Signup
       </NavDropdown.Item>
 
       <Modal show={show} onHide={handleClose}>
