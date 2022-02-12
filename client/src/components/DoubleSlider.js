@@ -8,6 +8,7 @@ export default function DoubleSlider({
   max,
   searchParams,
   setSearchParams,
+  setOpenDropdown,
 }) {
   const [avg, setAvg] = useState((min + max) / 2);
   const [minVal, setMinVal] = useState(avg);
@@ -84,13 +85,14 @@ export default function DoubleSlider({
         </div>
       </div>
       <Button
-        onClick={() =>
+        onClick={() => {
           setSearchParams({
             ...searchParams,
             minPrice: minVal,
             maxPrice: maxVal,
-          })
-        }
+          });
+          setOpenDropdown(false);
+        }}
         className="mt-2"
         variant="secondary"
       >

@@ -12,6 +12,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 
 export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [openDropdown, setOpenDropdown] = useState(false);
   const [listings, setListings] = useState([]);
 
   useEffect(() => {
@@ -25,14 +26,20 @@ export default function Dashboard() {
   return (
     <Container fluid className="dashboard">
       <Row className="filter-bar">
-        <Dropdown>
-          <Dropdown.Toggle className="toggle">Filters</Dropdown.Toggle>
+        <Dropdown show={openDropdown}>
+          <Dropdown.Toggle
+            onClick={() => setOpenDropdown(!openDropdown)}
+            className="toggle"
+          >
+            Price
+          </Dropdown.Toggle>
           <Dropdown.Menu>
             <DoubleSlider
               searchParams={searchParams}
               setSearchParams={setSearchParams}
               min={100}
               max={3000}
+              setOpenDropdown={setOpenDropdown}
             />
           </Dropdown.Menu>
         </Dropdown>

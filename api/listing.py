@@ -9,6 +9,15 @@ from . import db
 listing = Blueprint('listing', __name__)
 
 
+def normalize_query_param(value):
+    return value if len(value) > 1 else value[0]
+
+
+def normalize_query(params):
+    params_non_flat = params.to_dict(flat=False)
+    return {k: normalize_query_param(v) if k != "location" else v for k, v in params_non_flat.items()}
+
+
 @listing.route("/listing/<int:listing_id>", methods=["GET"])
 def get_listing(listing_id):
     listing = Listing.query.filter_by(id=listing_id).first()
@@ -19,18 +28,21 @@ def get_listing(listing_id):
 
 @listing.route("/listing", methods=["GET"])
 def get_all_listings():
-    args = request.args
+    args = normalize_query(request.args)
     location = args.get("location")
     type = args.get("type")
+    if type != "undefined":
+        type = True if type == "room" else False
     number = args.get("number")
     minPrice = args.get("minPrice")
     maxPrice = args.get("maxPrice")
+    print(args)
     listings = Listing.query
-    if location is not None and location != "":
-        listings = listings.filter(Listing.location == location)
-    if type is not None and type != "":
+    if location is not None and location != "" and "undefined" not in location:
+        listings = listings.filter(Listing.location.in_(location))
+    if type is not None and type != "" and type != "undefined":
         listings = listings.filter(Listing.isRoom == type)
-    if number is not None and number != "":
+    if number is not None and number != "" and number != "undefined":
         listings = listings.filter(Listing.numRooms == number)
     if minPrice is not None and minPrice != "":
         listings = listings.filter(Listing.price >= minPrice)
