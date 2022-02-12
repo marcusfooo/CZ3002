@@ -11,27 +11,37 @@ import "../styles/Listing.css";
 import { useUser } from "../contexts/UserContext";
 import { publicKey } from "../chatEngine";
 import Form from "react-bootstrap/Form";
+import { useForm } from "react-hook-form";
 
 export default function Listing() {
   const { listingId } = useParams();
   const [listingData, setListingData] = useState();
   const [images, setImages] = useState([]);
+  const [bids, setBids] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useUser();
   const navigate = useNavigate();
+  const { register, handleSubmit } = useForm();
 
   useEffect(() => {
     async function getListingData() {
       setLoading(true);
       const res = await axios.get(`/api/listing/${listingId}`);
-      const filenames = await axios.get(`/api/images/${listingId}`);
-      console.log(res);
-      setImages(filenames.data.data);
+      //get bidding data if user is the lister
+      if (res.data?.listing.seller.email === currentUser?.email) {
+        const bids = await axios.get(`/api/bids/listing/${listingId}`, {
+          withCredentials: true,
+        });
+        setBids(bids.data.bids);
+      }
+      setImages(res.data.listing.images);
       setListingData(res.data.listing);
       setLoading(false);
     }
     getListingData();
-  }, [listingId]);
+  }, [listingId, currentUser]);
+
+  console.log(images);
 
   async function createDirectChat() {
     const creds = {
@@ -54,6 +64,13 @@ export default function Listing() {
     navigate(`/chat/${chatId}`);
   }
 
+  async function placeBid(data) {
+    const res = await axios.post(`/api/bids/listing/${listingId}`, data, {
+      withCredentials: true,
+    });
+    console.log(res);
+  }
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -70,10 +87,10 @@ export default function Listing() {
         <Container>
           <div className="photo-grid">
             {images.map((image, idx) => (
-              <div key={image} className="shadow-sm photo-card">
+              <div key={image.id} className="shadow-sm photo-card">
                 <Image
                   rounded
-                  src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${image}`}
+                  src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${image.file_name}`}
                 />
               </div>
             ))}
@@ -94,20 +111,45 @@ export default function Listing() {
         </Col>
         <Col>
           <Card>
-            <Card.Body>
-              <p>{listingData.seller.email}</p>
-              <Button
-                className="w-100 mb-2"
-                variant="secondary"
-                onClick={createDirectChat}
-              >
-                Chat now
-              </Button>
-              <Form.Control type="number" placeholder="Enter a bid eg. 1000" />
-              <Button className="w-100 mt-2" onClick={createDirectChat}>
-                Place Bid
-              </Button>
-            </Card.Body>
+            {currentUser && currentUser.email === listingData?.seller.email ? (
+              <Card.Body>
+                <p>Current bids</p>
+                <div>
+                  {bids.map((bid) => (
+                    <p>
+                      {bid.bidder.email} placed ${bid.amount}
+                    </p>
+                  ))}
+                </div>
+              </Card.Body>
+            ) : (
+              <Card.Body>
+                <p>{listingData.seller.email}</p>
+                <Button
+                  className="w-100 mb-2"
+                  variant="secondary"
+                  onClick={createDirectChat}
+                  disabled={!currentUser}
+                >
+                  {currentUser ? "Chat now" : "Login to chat"}
+                </Button>
+                <Form onSubmit={handleSubmit(placeBid)}>
+                  <Form.Control
+                    {...register("amount")}
+                    name="amount"
+                    type="number"
+                    placeholder="Enter a bid eg. 1000"
+                  />
+                  <Button
+                    disabled={!currentUser}
+                    className="w-100 mt-2"
+                    type="submit"
+                  >
+                    {currentUser ? "Place Bid" : "Login to Bid"}
+                  </Button>
+                </Form>
+              </Card.Body>
+            )}
           </Card>
         </Col>
       </Row>

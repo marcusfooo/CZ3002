@@ -27,4 +27,4 @@ class BiddingSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Bid
     bidder = ma.Nested(UserSchema(only=("email",)))
-    listing = ma.Nested(Listing)
+    listing = ma.Nested(ListingSchema(only=("id",)))

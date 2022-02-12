@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, make_response, request
 from flask_login import current_user, login_required
 
 from api.models.bid import Bid
+from api.models.listing import Listing
 from api.schemas import BiddingSchema
 from . import db
 
@@ -9,7 +10,13 @@ bid = Blueprint('bid', __name__)
 
 
 @bid.route("/bids/listing/<int:listing_id>", methods=["GET"])
+@login_required
 def get_bids(listing_id):
+    # verify if user is the owner of the listing
+    listing = Listing.query.filter(
+        Listing.id == listing_id, Listing.seller_id == current_user.id).first()
+    if listing is None:
+        return make_response(jsonify({"message": "Not allowed"}), 403)
     bids = Bid.query.filter_by(listing_id=listing_id)
     bidding_schema = BiddingSchema(many=True)
 
@@ -36,4 +43,4 @@ def place_bid(listing_id):
 
     db.session.add(new_bid)
     db.session.commit()
-    return make_response(jsonify({"message": "Successfully created new listing", "id": new_bid.id}), 200)
+    return make_response(jsonify({"message": "Successfully created new bidding", "id": new_bid.id}), 200)

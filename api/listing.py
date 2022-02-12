@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify, make_response, request
 from flask_login import current_user, login_required
 
+from api.models.bid import Bid
+
 from .models.listing import Listing
-from .schemas import ListingSchema
+from .schemas import BiddingSchema, ListingSchema
 from . import db
 
 listing = Blueprint('listing', __name__)
