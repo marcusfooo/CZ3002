@@ -1,5 +1,11 @@
+import enum
 from api import db
 from datetime import datetime
+
+
+class ListingStatusEnum(enum.Enum):
+    open = "open"
+    closed = "closed"
 
 
 class Listing(db.Model):
@@ -14,6 +20,7 @@ class Listing(db.Model):
     numRooms = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False,
                            default=datetime.utcnow)
+    status = db.Column(db.Enum(ListingStatusEnum), default="open")
     seller_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     seller = db.relationship(
         "User", back_populates="listings")

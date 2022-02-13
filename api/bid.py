@@ -44,3 +44,14 @@ def place_bid(listing_id):
     db.session.add(new_bid)
     db.session.commit()
     return make_response(jsonify({"message": "Successfully created new bidding", "id": new_bid.id}), 200)
+
+
+@bid.route("/bids/<int:bid_id>", methods=["PUT"])
+@login_required
+def update_bid_status(bid_id):
+    bidding_data = request.get_json()
+    status = bidding_data["status"]
+    bid = Bid.query.filter_by(id=bid_id).first()
+    bid.status = status
+    db.session.commit()
+    return make_response(jsonify({"message": "Successfully updated status"}), 200)

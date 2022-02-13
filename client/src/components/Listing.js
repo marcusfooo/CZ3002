@@ -12,6 +12,7 @@ import { useUser } from "../contexts/UserContext";
 import { publicKey } from "../chatEngine";
 import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
+import BidModal from "./BidModal";
 
 export default function Listing() {
   const { listingId } = useParams();
@@ -22,7 +23,8 @@ export default function Listing() {
   const { currentUser } = useUser();
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
-
+  const [openBidModal, setOpenBidModal] = useState({});
+  console.log(bids);
   useEffect(() => {
     async function getListingData() {
       setLoading(true);
@@ -33,6 +35,9 @@ export default function Listing() {
           withCredentials: true,
         });
         setBids(bids.data.bids);
+        const bidControls = {};
+        bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
+        setOpenBidModal(bidControls);
       }
       setImages(res.data.listing.images);
       setListingData(res.data.listing);
@@ -40,8 +45,6 @@ export default function Listing() {
     }
     getListingData();
   }, [listingId, currentUser]);
-
-  console.log(images);
 
   async function createDirectChat() {
     const creds = {
@@ -115,10 +118,31 @@ export default function Listing() {
               <Card.Body>
                 <p>Current bids</p>
                 <div>
-                  {bids.map((bid) => (
-                    <p>
-                      {bid.bidder.email} placed ${bid.amount}
-                    </p>
+                  {bids.map((bid, idx) => (
+                    <div key={idx}>
+                      <BidModal
+                        id={bid.id}
+                        idx={idx}
+                        open={openBidModal}
+                        setOpenBidModal={setOpenBidModal}
+                        bidder={bid.bidder.email}
+                        amount={bid.amount}
+                      />
+                      <div
+                        type="button"
+                        onClick={() => {
+                          setOpenBidModal({ ...openBidModal, [idx]: true });
+                        }}
+                      >
+                        <p
+                          className={`${
+                            bid.status === "rejected" ? "text-danger" : ""
+                          }`}
+                        >
+                          {bid.bidder.email} placed ${bid.amount}
+                        </p>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </Card.Body>

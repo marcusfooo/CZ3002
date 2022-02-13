@@ -20,6 +20,7 @@ Jinja2==3.0.3
 jmespath==0.10.0
 MarkupSafe==2.0.1
 marshmallow==3.14.1
+marshmallow-enum==1.5.1
 marshmallow-sqlalchemy==0.27.0
 pycparser==2.21
 PyMySQL==1.0.2
