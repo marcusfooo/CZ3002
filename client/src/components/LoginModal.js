@@ -54,11 +54,15 @@ export default function LoginModal() {
 
   const signupSubmit = async (data) => {
     try {
-      await axios.post("/api/signup", data, {
+      const res = await axios.post("/api/signup", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
-      setCurrentUser({ email: data.email });
+      setCurrentUser({
+        id: data.id,
+        email: data.email,
+        password: res.data.password,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -66,11 +70,15 @@ export default function LoginModal() {
 
   const loginSubmit = async (data) => {
     try {
-      await axios.post("/api/login", data, {
+      const res = await axios.post("/api/login", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });
-      setCurrentUser({ email: data.email });
+      setCurrentUser({
+        id: data.id,
+        email: data.email,
+        password: res.data.password,
+      });
     } catch (error) {
       console.error(error);
     }

@@ -57,21 +57,17 @@ export default function NewListing() {
 
   const onChange = (imageList, addUpdateIndex) => {
     // data for submit
-    console.log(imageList, addUpdateIndex);
     setImages(imageList);
   };
 
   const postListing = async (data) => {
-    console.log(data);
     data.isRoom = data.isRoom === "room" ? true : false;
-    //TODO
     const location = "somelocation";
     const finalData = {
       ...data,
       location: location,
       seller_id: currentUser.id,
     };
-    console.log(finalData);
     try {
       const res = await axios.post("/api/listing", finalData, {
         withCredentials: true,
