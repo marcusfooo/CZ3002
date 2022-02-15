@@ -19,9 +19,12 @@ def get_bids(listing_id):
         bid_schema = BiddingSchema()
         bid = Bid.query.filter_by(listing_id=listing_id,
                                   bidder_id=current_user.id)
-        return make_response(jsonify({"bid": bid_schema.dump(bid.first())}), 200)
+        bids = Bid.query.filter_by(
+            listing_id=listing_id).order_by(Bid.amount.desc())
+        return make_response(jsonify({"bid": bid_schema.dump(bid.first()), "highest": bid_schema.dump(bids.first())}), 200)
 
-    bids = Bid.query.filter_by(listing_id=listing_id)
+    bids = Bid.query.filter_by(
+        listing_id=listing_id).order_by(Bid.amount.desc())
     bidding_schema = BiddingSchema(many=True)
 
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)

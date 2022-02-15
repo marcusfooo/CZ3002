@@ -14,6 +14,11 @@ import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import BidModal from "./BidModal";
 import Spinner from "react-bootstrap/Spinner";
+import { getRecommendation } from "../utils";
+import { ReactComponent as Logo } from "../assets/rentsg.svg";
+import Alert from "react-bootstrap/Alert";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 export async function createDirectChat(currentUser, users) {
   const creds = {
@@ -40,11 +45,13 @@ export default function Listing() {
   const [images, setImages] = useState([]);
   const [listingBids, setListingBids] = useState([]);
   const [myBid, setMyBid] = useState({});
+  const [highestBid, setHighestBid] = useState();
   const [loading, setLoading] = useState(true);
   const { currentUser } = useUser();
   const navigate = useNavigate();
   const { register, handleSubmit, setValue } = useForm();
   const [openBidModal, setOpenBidModal] = useState({});
+  const [showAlert, setShowAlert] = useState(true);
 
   useEffect(() => {
     async function getListingData() {
@@ -64,8 +71,10 @@ export default function Listing() {
         const res = await axios.get(`/api/bids/listing/${listingId}`, {
           withCredentials: true,
         });
-        setMyBid(res.data.bid);
-        setValue("amount", res?.data?.bid?.amount);
+        console.log(res);
+        setMyBid(res.data?.bid);
+        setHighestBid(res.data?.highest?.amount);
+        setValue("amount", res.data?.bid?.amount);
       }
       setImages(res.data.listing.images);
       setListingData(res.data.listing);
@@ -79,6 +88,7 @@ export default function Listing() {
       withCredentials: true,
     });
     setMyBid(data);
+    setShowAlert(true);
   }
 
   async function closeListing(id) {
@@ -99,7 +109,22 @@ export default function Listing() {
   }
 
   return (
-    <Container>
+    <Container className="pb-5">
+      <ToastContainer position="bottom-center">
+        <Toast
+          onClose={() => setShowAlert(false)}
+          bg="success"
+          delay={3000}
+          autohide
+          show={showAlert}
+        >
+          <Toast.Header>
+            <h6 className="me-auto text-black text-center">
+              Successfully placed bid!
+            </h6>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer>
       <Row className="mt-3">
         <h3>{listingData.title}</h3>
       </Row>
@@ -127,8 +152,28 @@ export default function Listing() {
               <h4>Description</h4>
               <p>{listingData.description}</p>
             </Col>
-            <Col>
-              <h5>${listingData.price} SGD/mo</h5>
+            <Col className="d-flex align-items-end flex-column">
+              <h4>${listingData.price} SGD/mo</h4>
+              <div className="text-secondary bg-primary rounded p-2">
+                <Logo style={{ width: "80px" }} />
+                <span className="fw-bold ps-2">Recommended</span>
+                <h5 className="text-end mt-2">
+                  $
+                  {getRecommendation(
+                    listingData.location,
+                    listingData.numRooms
+                  )}{" "}
+                  SGD/mo
+                </h5>
+              </div>
+              {
+                <div className="text-white bg-secondary rounded p-2 mt-3">
+                  <span className="ps-2">Highest Bid Now</span>
+                  <h6 className="text-end mt-2">
+                    {highestBid ? `${highestBid} SGD/mo` : "None"}
+                  </h6>
+                </div>
+              }
             </Col>
           </Row>
         </Col>
