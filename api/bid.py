@@ -16,7 +16,11 @@ def get_bids(listing_id):
     listing = Listing.query.filter(
         Listing.id == listing_id, Listing.seller_id == current_user.id).first()
     if listing is None:
-        return make_response(jsonify({"message": "Not allowed"}), 403)
+        bid_schema = BiddingSchema()
+        bid = Bid.query.filter_by(listing_id=listing_id,
+                                  bidder_id=current_user.id)
+        return make_response(jsonify({"bid": bid_schema.dump(bid.first())}), 200)
+
     bids = Bid.query.filter_by(listing_id=listing_id)
     bidding_schema = BiddingSchema(many=True)
 
@@ -52,6 +56,9 @@ def update_bid_status(bid_id):
     bidding_data = request.get_json()
     status = bidding_data["status"]
     bid = Bid.query.filter_by(id=bid_id).first()
+    if status == "approved":
+        listing = Listing.query.filter_by(id=bid.listing_id).first()
+        listing.status = "closed"
     bid.status = status
     db.session.commit()
     return make_response(jsonify({"message": "Successfully updated status"}), 200)

@@ -14,17 +14,37 @@ import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import BidModal from "./BidModal";
 
+export async function createDirectChat(currentUser, users) {
+  const creds = {
+    "Public-Key": publicKey,
+    "User-Name": currentUser.email,
+    "User-Secret": currentUser.password,
+    "Content-Type": "application/json",
+  };
+  const res = await fetch("https://api.chatengine.io/chats/", {
+    method: "PUT",
+    body: JSON.stringify({
+      is_direct_chat: true,
+      usernames: users,
+    }),
+    headers: creds,
+  });
+  const data = await res.json();
+  return data.id;
+}
+
 export default function Listing() {
   const { listingId } = useParams();
   const [listingData, setListingData] = useState();
   const [images, setImages] = useState([]);
-  const [bids, setBids] = useState([]);
+  const [listingBids, setListingBids] = useState([]);
+  const [myBid, setMyBid] = useState({});
   const [loading, setLoading] = useState(true);
   const { currentUser } = useUser();
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const [openBidModal, setOpenBidModal] = useState({});
-  console.log(bids);
+
   useEffect(() => {
     async function getListingData() {
       setLoading(true);
@@ -34,44 +54,41 @@ export default function Listing() {
         const bids = await axios.get(`/api/bids/listing/${listingId}`, {
           withCredentials: true,
         });
-        setBids(bids.data.bids);
+        setListingBids(bids.data.bids);
         const bidControls = {};
         bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
         setOpenBidModal(bidControls);
+      } else if (currentUser) {
+        //get own bid if not lister
+        const res = await axios.get(`/api/bids/listing/${listingId}`, {
+          withCredentials: true,
+        });
+        setMyBid(res.data.bid);
+        setValue("amount", res?.data?.bid?.amount);
       }
       setImages(res.data.listing.images);
       setListingData(res.data.listing);
       setLoading(false);
     }
     getListingData();
-  }, [listingId, currentUser]);
-
-  async function createDirectChat() {
-    const creds = {
-      "Public-Key": publicKey,
-      "User-Name": currentUser.email,
-      "User-Secret": currentUser.password,
-      "Content-Type": "application/json",
-    };
-    const res = await fetch("https://api.chatengine.io/chats/", {
-      method: "PUT",
-      body: JSON.stringify({
-        is_direct_chat: true,
-        usernames: [listingData.seller.email],
-      }),
-      headers: creds,
-    });
-    const data = await res.json();
-    const chatId = data.id;
-
-    navigate(`/chat/${chatId}`);
-  }
+  }, [listingId, currentUser, setValue]);
 
   async function placeBid(data) {
     const res = await axios.post(`/api/bids/listing/${listingId}`, data, {
       withCredentials: true,
     });
+    setMyBid(data);
     console.log(res);
+  }
+
+  async function closeListing(id) {
+    const res = await axios.put(
+      `/api/bids/${id}`,
+      { status: "approved" },
+      { withCredentials: true }
+    );
+    console.log(res);
+    setListingData({ ...listingData, status: "closed" });
   }
 
   if (loading) {
@@ -114,11 +131,17 @@ export default function Listing() {
         </Col>
         <Col>
           <Card>
-            {currentUser && currentUser.email === listingData?.seller.email ? (
+            {listingData.status === "closed" ? (
+              <Card.Body>
+                <p>{listingData.seller.email}</p>
+                <Button className="w-100">Sold</Button>
+              </Card.Body>
+            ) : currentUser &&
+              currentUser.email === listingData?.seller.email ? (
               <Card.Body>
                 <p>Current bids</p>
                 <div>
-                  {bids.map((bid, idx) => (
+                  {listingBids.map((bid, idx) => (
                     <div key={idx}>
                       <BidModal
                         id={bid.id}
@@ -127,6 +150,7 @@ export default function Listing() {
                         setOpenBidModal={setOpenBidModal}
                         bidder={bid.bidder.email}
                         amount={bid.amount}
+                        closeListing={closeListing}
                       />
                       <div
                         type="button"
@@ -152,7 +176,12 @@ export default function Listing() {
                 <Button
                   className="w-100 mb-2"
                   variant="secondary"
-                  onClick={createDirectChat}
+                  onClick={async () => {
+                    const chatId = await createDirectChat(currentUser, [
+                      listingData.seller.email,
+                    ]);
+                    navigate(`/chat/${chatId}`);
+                  }}
                   disabled={!currentUser}
                 >
                   {currentUser ? "Chat now" : "Login to chat"}
@@ -162,10 +191,11 @@ export default function Listing() {
                     {...register("amount")}
                     name="amount"
                     type="number"
+                    disabled={myBid.amount}
                     placeholder="Enter a bid eg. 1000"
                   />
                   <Button
-                    disabled={!currentUser}
+                    disabled={!currentUser || myBid.amount}
                     className="w-100 mt-2"
                     type="submit"
                   >
