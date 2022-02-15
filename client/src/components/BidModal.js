@@ -30,7 +30,6 @@ export default function BidModal({
       { status: status },
       { withCredentials: true }
     );
-    console.log(res);
     closeModal(idx);
   };
   return (

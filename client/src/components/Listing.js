@@ -13,6 +13,7 @@ import { publicKey } from "../chatEngine";
 import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import BidModal from "./BidModal";
+import Spinner from "react-bootstrap/Spinner";
 
 export async function createDirectChat(currentUser, users) {
   const creds = {
@@ -78,7 +79,6 @@ export default function Listing() {
       withCredentials: true,
     });
     setMyBid(data);
-    console.log(res);
   }
 
   async function closeListing(id) {
@@ -87,12 +87,15 @@ export default function Listing() {
       { status: "approved" },
       { withCredentials: true }
     );
-    console.log(res);
     setListingData({ ...listingData, status: "closed" });
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-100 h-100 d-flex justify-content-center align-items-center">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
   }
 
   return (
