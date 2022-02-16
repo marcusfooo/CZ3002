@@ -4,8 +4,10 @@ from flask import Blueprint, jsonify, make_response, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models.user import User
 from flask_login import current_user, login_user, login_required, logout_user
-from . import db
+from . import db, mail
 import requests
+from flask_mail import Message
+from itsdangerous import SignatureExpired, URLSafeSerializer
 
 auth = Blueprint('auth', __name__)
 
@@ -14,6 +16,8 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 # Connect the path with your '.env' file name
 load_dotenv(os.path.join(BASEDIR, '.env'))
+
+auth_s = URLSafeSerializer("secret key")
 
 
 @auth.route("/user", methods=["GET"])
@@ -37,6 +41,13 @@ def login_post():
             jsonify({"message": "Email or Password incorrect."}), 400)
         return response
     # if the above check passes, then we know the user has the right credentials
+
+    # check if user is verified
+    if user.isVerified == False:
+        response = jsonify({'message': "Email not verified"})
+        response.status_code = 401
+        return response
+
     login_user(user)
     return make_response(jsonify({"message": "Successfully authenticated", "password": user.password}), 200)
 
@@ -63,11 +74,20 @@ def signup_post():
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
-    login_user(new_user)
-    # create chatengine user
-    chat_response = requests.post('https://api.chatengine.io/users/', data={"username": email, "secret": password}, headers={
-        "PRIVATE-KEY": os.getenv("CHAT_ENGINE_PRIVATE_KEY")
-    })
+
+    token = auth_s.dumps(email, salt='email-confirm')
+
+    msg = Message('Confirm Email', recipients=[email])
+
+    if os.environ["FLASK_ENV"] == "prod":
+        link = ""
+    else:
+        link = "http://localhost:3000/confirm-email/{}".format(token)
+
+    msg.body = 'Your link is {}'.format(link)
+
+    mail.send(msg)
+
     response = make_response(jsonify({"message": "Signed up"}))
     return response
 
@@ -77,3 +97,40 @@ def signup_post():
 def logout():
     logout_user()
     return make_response(jsonify({"message": "Logged out"}), 200)
+
+
+@auth.route('/confirm-email/<token>', methods=['GET'])
+def confirm_email(token):
+    try:
+        email = auth_s.loads(token, salt='email-confirm', max_age=3600)
+        user = User.query.filter_by(email=email).first()
+        user.isVerified = True
+        db.session.commit()
+        # create chatengine user
+        chat_response = requests.post('https://api.chatengine.io/users/', data={"username": email, "secret": user.password}, headers={
+            "PRIVATE-KEY": os.getenv("CHAT_ENGINE_PRIVATE_KEY")
+        })
+        login_user(user)
+        return make_response(jsonify({"id": user.id, "email": user.email, "password": user.password}))
+    except SignatureExpired:
+        return make_response(jsonify({"message": "Token has expired"}), 401)
+
+
+@auth.route('/confirm-email', methods=["POST"])
+def send_confirm_email():
+    email = request.json["email"]
+
+    token = auth_s.dumps(email, salt='email-confirm')
+
+    msg = Message('Confirm Email', recipients=[email])
+
+    if os.environ["FLASK_ENV"] == "prod":
+        link = ""
+    else:
+        link = "http://localhost:3000/confirm-email/{}".format(token)
+
+    msg.body = 'Your link is {}'.format(link)
+
+    mail.send(msg)
+
+    return make_response(jsonify({"message": "Verification email sent"}), 200)

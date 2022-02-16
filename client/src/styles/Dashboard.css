@@ -12,16 +12,18 @@
 }
 
 .dashboard-main {
-  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .list {
+  height: 100%;
   display: grid;
   grid-auto-rows: 250px;
   gap: 2em;
   overflow-y: scroll;
   overflow-x: hidden;
   padding-top: 1em;
+  margin-right: 0.25em;
 }
 
 .list::-webkit-scrollbar {

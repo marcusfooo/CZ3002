@@ -6,12 +6,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from dotenv import load_dotenv
+from flask_mail import Mail
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
 db = SQLAlchemy()
 ma = Marshmallow()
+mail = Mail()
 
 
 def create_app():
@@ -35,6 +37,14 @@ def create_app():
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # mail configurations
+    app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'apikey'
+    app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers',
@@ -45,6 +55,7 @@ def create_app():
 
     db.init_app(app)
     ma.init_app(app)
+    mail.init_app(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)

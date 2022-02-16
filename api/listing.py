@@ -32,22 +32,20 @@ def get_all_listings():
     args = normalize_query(request.args)
     location = args.get("location")
     type = args.get("type")
-    if type != "undefined":
-        type = True if type == "room" else False
     number = args.get("number")
     minPrice = args.get("minPrice")
     maxPrice = args.get("maxPrice")
-    print(args)
     listings = Listing.query
     if location is not None and location != "" and "undefined" not in location:
         listings = listings.filter(Listing.location.in_(location))
     if type is not None and type != "" and type != "undefined":
+        type = True if type == "room" else False
         listings = listings.filter(Listing.isRoom == type)
     if number is not None and number != "" and number != "undefined":
         listings = listings.filter(Listing.numRooms == number)
     if minPrice is not None and minPrice != "":
         listings = listings.filter(Listing.price >= minPrice)
-    if maxPrice is not None and maxPrice != " ":
+    if maxPrice is not None and maxPrice != "":
         listings = listings.filter(Listing.price <= maxPrice)
     listing_schema = ListingSchema(many=True)
     return make_response(jsonify({"listings": listing_schema.dump(listings.all())}), 200)

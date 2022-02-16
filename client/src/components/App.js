@@ -9,6 +9,7 @@ import Listing from "./Listing";
 import Chat from "./Chat";
 import { ChatEngineWrapper } from "react-chat-engine";
 import Dashboard from "./Dashboard";
+import VerifyEmail from "./VerifyEmail";
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
           <BrowserRouter>
             <Header />
             <Routes>
+              <Route path="/confirm-email" element={<VerifyEmail />} />
+              <Route path="/confirm-email/:token" element={<VerifyEmail />} />
               <Route path="/" element={<Home />} />
               <Route path="/listing" element={<Dashboard />} />
               <Route path="/listing/:listingId" element={<Listing />} />

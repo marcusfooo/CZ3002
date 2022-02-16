@@ -19,6 +19,7 @@ export default function Dashboard() {
     async function getListings() {
       const res = await axios.get("/api/listing?" + searchParams);
       setListings(res.data.listings);
+      console.log(res);
     }
     getListings();
   }, [searchParams]);

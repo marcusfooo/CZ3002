@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Container from "react-bootstrap/esm/Container";
 import axios from "../axios";
 import { useUser } from "../contexts/UserContext";
+import { Link } from "react-router-dom";
 
 const loginSchema = yup
   .object({
@@ -46,6 +47,7 @@ export default function LoginModal() {
   const {
     handleSubmit: handleLoginSubmit,
     formState: { errors: loginErrors },
+    setError: setLoginError,
     control: loginControl,
   } = useForm({ resolver: yupResolver(loginSchema) });
 
@@ -80,7 +82,19 @@ export default function LoginModal() {
         password: res.data.password,
       });
     } catch (error) {
-      console.error(error);
+      if (error.response?.data?.message === "Email not verified") {
+        setLoginError("verificationError", {
+          type: "manual",
+          message: "Email not yet verified. ",
+        });
+      } else if (
+        error.response?.data?.message === "Email or Password incorrect."
+      ) {
+        setLoginError("password", {
+          type: "manual",
+          message: "Email or password is incorrect",
+        });
+      }
     }
   };
 
@@ -162,6 +176,18 @@ export default function LoginModal() {
                 )}
               />
               <p className="text-danger">{loginErrors.password?.message}</p>
+              {loginErrors.verificationError && (
+                <p>
+                  Email not yet verified.{" "}
+                  <Link
+                    onClick={() => setShow(false)}
+                    className="text-underline"
+                    to="/confirm-email"
+                  >
+                    Resend verification.
+                  </Link>
+                </p>
+              )}
             </Form.Group>
             <Container className="p-0 d-flex justify-content-between">
               <Button type="submit" variant="primary">
