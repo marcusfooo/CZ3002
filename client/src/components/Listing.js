@@ -16,7 +16,6 @@ import BidModal from "./BidModal";
 import Spinner from "react-bootstrap/Spinner";
 import { getRecommendation } from "../utils";
 import { ReactComponent as Logo } from "../assets/rentsg.svg";
-import Alert from "react-bootstrap/Alert";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 
@@ -51,7 +50,7 @@ export default function Listing() {
   const navigate = useNavigate();
   const { register, handleSubmit, setValue } = useForm();
   const [openBidModal, setOpenBidModal] = useState({});
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     async function getListingData() {

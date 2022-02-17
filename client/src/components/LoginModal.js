@@ -11,6 +11,7 @@ import Container from "react-bootstrap/esm/Container";
 import axios from "../axios";
 import { useUser } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
+import Spinner from "react-bootstrap/Spinner";
 
 const loginSchema = yup
   .object({
@@ -35,14 +36,17 @@ const signupSchema = yup
   })
   .required();
 
-export default function LoginModal() {
+export default function LoginModal({ setShowToast }) {
   const [show, setShow] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const { setCurrentUser } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
   const {
     handleSubmit: handleSignupSubmit,
     control: signupControl,
     formState: { errors: signupErrors },
+    setError: setSignupError,
   } = useForm({ resolver: yupResolver(signupSchema) });
   const {
     handleSubmit: handleLoginSubmit,
@@ -56,31 +60,36 @@ export default function LoginModal() {
 
   const signupSubmit = async (data) => {
     try {
+      setLoading(true);
       const res = await axios.post("/api/signup", data, {
         withCredentials: true,
-        headers: { "Content-Type": "application/json" },
       });
-      setCurrentUser({
-        id: data.id,
-        email: data.email,
-        password: res.data.password,
-      });
+      //show verification screen
+      setEmail(data.email);
+      setActiveTab(2);
     } catch (error) {
       console.error(error);
+      if (error.response?.data?.message === "Email already exists") {
+        setSignupError("email", {
+          type: "manual",
+          message: "Email already exists.",
+        });
+      }
     }
+    setLoading(false);
   };
 
   const loginSubmit = async (data) => {
     try {
       const res = await axios.post("/api/login", data, {
         withCredentials: true,
-        headers: { "Content-Type": "application/json" },
       });
       setCurrentUser({
         id: data.id,
         email: data.email,
         password: res.data.password,
       });
+      setShowToast(true);
     } catch (error) {
       if (error.response?.data?.message === "Email not verified") {
         setLoginError("verificationError", {
@@ -103,7 +112,6 @@ export default function LoginModal() {
       <NavDropdown.Item variant="primary" onClick={handleShow}>
         Login/Signup
       </NavDropdown.Item>
-
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <div className="tabs">
@@ -111,12 +119,32 @@ export default function LoginModal() {
               onClick={() => setActiveTab(0)}
               className={activeTab === 0 ? "active" : ""}
             >
+              {loading && (
+                <Spinner
+                  variant="secondary"
+                  as="span"
+                  size="sm"
+                  animation="border"
+                  role="status"
+                />
+              )}{" "}
               Login
             </div>
             <div
               onClick={() => setActiveTab(1)}
-              className={"ml-4 " + (activeTab === 1 ? "active" : "")}
+              className={
+                "ml-4 " + (activeTab === 1 || activeTab === 2 ? "active" : "")
+              }
             >
+              {loading && (
+                <Spinner
+                  variant="secondary"
+                  as="span"
+                  size="sm"
+                  animation="border"
+                  role="status"
+                />
+              )}{" "}
               Signup
             </div>
             <div
@@ -127,6 +155,10 @@ export default function LoginModal() {
           </div>
         </Modal.Header>
         <Modal.Body className="tabBody">
+          <div className={"form " + (activeTab === 2 ? "activeBody" : null)}>
+            <h5>An email has been sent to {email}</h5>
+            <p>Please verify your account before logging in.</p>
+          </div>
           <Form
             noValidate
             onSubmit={handleLoginSubmit(loginSubmit)}

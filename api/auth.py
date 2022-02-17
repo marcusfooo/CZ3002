@@ -63,7 +63,7 @@ def signup_post():
 
     if user:  # if a user is found, we want to redirect back to signup page so user can try again
         response = make_response(
-            jsonify({"message": "Email already exists please try again."}), 400)
+            jsonify({"message": "Email already exists"}), 400)
         return response
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.
@@ -88,8 +88,7 @@ def signup_post():
 
     mail.send(msg)
 
-    response = make_response(jsonify({"message": "Signed up"}))
-    return response
+    return make_response(jsonify({"message": "Signed up"}), 200)
 
 
 @auth.route('/logout', methods=["GET"])

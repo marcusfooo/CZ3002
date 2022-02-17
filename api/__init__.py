@@ -71,10 +71,6 @@ def create_app():
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix="/api")
 
-    # blueprint for non-auth parts of app
-    from .main import main as main_blueprint
-    app.register_blueprint(main_blueprint, url_prefix="/api")
-
     from .listing import listing as listing_blueprint
     app.register_blueprint(listing_blueprint, url_prefix="/api")
 

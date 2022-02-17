@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -12,10 +12,13 @@ import "../styles/Header.css";
 import FilterForm from "./FilterForm";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import ToastContainer from "react-bootstrap/ToastContainer";
+import Toast from "react-bootstrap/Toast";
 
 export default function Header() {
   const { currentUser, setCurrentUser } = useUser();
   const location = useLocation();
+  const [showToast, setShowToast] = useState(false);
 
   const logout = async () => {
     try {
@@ -28,6 +31,20 @@ export default function Header() {
 
   return (
     <Navbar className="header px-3" bg="primary" expand="sm">
+      <ToastContainer position="top-center">
+        <Toast
+          onClose={() => setShowToast(false)}
+          bg="success"
+          delay={3000}
+          autohide
+          show={showToast}
+        >
+          <Toast.Header>
+            <h6 className="me-auto text-black text-center">Logged in!</h6>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer>
+
       <Container fluid>
         <Row className="w-100">
           <Col md="auto" className="d-flex align-items-center">
@@ -61,7 +78,7 @@ export default function Header() {
                       Signed in as: {currentUser.email.split("@")[0]}
                     </NavDropdown.Item>
                   ) : (
-                    <LoginModal />
+                    <LoginModal setShowToast={setShowToast} />
                   )}
                   {currentUser && (
                     <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>

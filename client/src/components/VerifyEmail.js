@@ -34,7 +34,10 @@ export default function VerifyEmail() {
   useEffect(() => {
     async function verifyEmail() {
       try {
-        const res = await axios.get(`/api/confirm-email/${token}`);
+        const res = await axios.get(`/api/confirm-email/${token}`, {
+          withCredentials: true,
+        });
+        console.log(res);
         setCurrentUser({
           id: res.data.id,
           email: res.data.email,

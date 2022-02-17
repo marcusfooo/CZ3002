@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import "../styles/NewListing.css";
 import Button from "react-bootstrap/Button";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "../axios";
@@ -16,6 +16,8 @@ import { AiFillDelete } from "react-icons/ai";
 import { GrUpdate } from "react-icons/gr";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Select from "react-select";
+import { planningAreas } from "../planningArea";
 
 const listingSchema = yup
   .object({
@@ -24,6 +26,7 @@ const listingSchema = yup
       .string()
       .matches(/\d{6}/, "Invalid Singapore postal code")
       .required(),
+    location: yup.string().required(),
     isRoom: yup
       .string()
       .required()
@@ -44,10 +47,14 @@ const listingSchema = yup
   })
   .required();
 
+const locationOptions = planningAreas.map((area) => {
+  return { value: area, label: area };
+});
 export default function NewListing() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({ resolver: yupResolver(listingSchema) });
   const navigate = useNavigate();
@@ -62,10 +69,8 @@ export default function NewListing() {
 
   const postListing = async (data) => {
     data.isRoom = data.isRoom === "room" ? true : false;
-    const location = "somelocation";
     const finalData = {
       ...data,
-      location: location,
       seller_id: currentUser.id,
     };
     try {
@@ -98,11 +103,6 @@ export default function NewListing() {
     });
     return res;
   };
-
-  //redirect user to homepage if not auth
-  if (!currentUser) {
-    return <Navigate to="/" replace />;
-  }
 
   return (
     <Container className="mt-3">
@@ -265,6 +265,22 @@ export default function NewListing() {
                   <p className="text-danger">{errors.postalCode?.message}</p>
                 </div>
 
+                <Controller
+                  control={control}
+                  name="location"
+                  render={({ field: { onChange, value, name, ref } }) => (
+                    <Select
+                      className="form-floating"
+                      inputRef={ref}
+                      isMulti
+                      isSearchable
+                      options={locationOptions}
+                      placeholder="Location"
+                      value={locationOptions.find((c) => c.value === value)}
+                      onChange={(val) => onChange(val.map((v) => v.value))}
+                    />
+                  )}
+                />
                 <div className="form-group mt-3">
                   <label htmlFor="numRooms">Number of Rooms</label>
                   <select
