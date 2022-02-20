@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import Col from "react-bootstrap/Col";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "../axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import ImageUploading from "react-images-uploading";
 import { AiFillDelete } from "react-icons/ai";
@@ -18,6 +18,7 @@ import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Select from "react-select";
 import { planningAreas } from "../planningArea";
+import Spinner from "react-bootstrap/Spinner";
 
 const listingSchema = yup
   .object({
@@ -60,6 +61,7 @@ export default function NewListing() {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const maxImageNumber = 5;
 
   const onChange = (imageList, addUpdateIndex) => {
@@ -68,6 +70,7 @@ export default function NewListing() {
   };
 
   const postListing = async (data) => {
+    setLoading(true);
     data.isRoom = data.isRoom === "room" ? true : false;
     const finalData = {
       ...data,
@@ -82,6 +85,7 @@ export default function NewListing() {
     } catch (error) {
       console.error(error);
     }
+    setLoading(false);
   };
 
   const uploadImages = async (listingId) => {
@@ -118,7 +122,7 @@ export default function NewListing() {
                 onChange={onChange}
                 maxNumber={maxImageNumber}
                 dataURLKey="data_url"
-                acceptType={["jpg", "png"]}
+                acceptType={["jpg", "png", "jpeg"]}
               >
                 {({
                   imageList,
@@ -165,7 +169,7 @@ export default function NewListing() {
                     <div className="imageGrid">
                       {imageList.map((image, index) => (
                         <div key={index} className="image-item">
-                          <img src={image["data_url"]} alt="" width="100" />
+                          <img src={image["data_url"]} alt="" width="100%" />
                           <div className="d-flex justify-content-between">
                             <OverlayTrigger overlay={<Tooltip>Update</Tooltip>}>
                               <Button
@@ -272,15 +276,15 @@ export default function NewListing() {
                     <Select
                       className="form-floating"
                       inputRef={ref}
-                      isMulti
                       isSearchable
                       options={locationOptions}
                       placeholder="Location"
                       value={locationOptions.find((c) => c.value === value)}
-                      onChange={(val) => onChange(val.map((v) => v.value))}
+                      onChange={(val) => onChange(val?.value)}
                     />
                   )}
                 />
+                <p className="text-danger">{errors.location?.message}</p>
                 <div className="form-group mt-3">
                   <label htmlFor="numRooms">Number of Rooms</label>
                   <select
@@ -318,6 +322,15 @@ export default function NewListing() {
                   <p className="text-danger">{errors.description?.message}</p>
                 </div>
                 <Button className="mt-3" type="submit">
+                  {loading && (
+                    <Spinner
+                      variant="secondary"
+                      as="span"
+                      size="sm"
+                      animation="border"
+                      role="status"
+                    />
+                  )}{" "}
                   Create new listing
                 </Button>
               </form>

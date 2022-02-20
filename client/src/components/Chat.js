@@ -23,7 +23,7 @@ export default function Chat() {
     <div className="chat-box">
       <ChatEngine
         height="100%"
-        publicKey={"966dcf77-9468-42f4-933e-1ccbfb702bb4"}
+        publicKey="966dcf77-9468-42f4-933e-1ccbfb702bb4"
         userName={currentUser.email}
         userSecret={currentUser.password}
         renderChatSettings={(chatAppState) => null}

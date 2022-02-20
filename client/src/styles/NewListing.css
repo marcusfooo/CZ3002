@@ -12,8 +12,10 @@
 .imageGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1em;
+  margin-top: 1em;
 }
 
 .image-item {
-  width: 100px;
+  /* width: 100px; */
 }

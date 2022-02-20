@@ -119,15 +119,6 @@ export default function LoginModal({ setShowToast }) {
               onClick={() => setActiveTab(0)}
               className={activeTab === 0 ? "active" : ""}
             >
-              {loading && (
-                <Spinner
-                  variant="secondary"
-                  as="span"
-                  size="sm"
-                  animation="border"
-                  role="status"
-                />
-              )}{" "}
               Login
             </div>
             <div
@@ -136,15 +127,6 @@ export default function LoginModal({ setShowToast }) {
                 "ml-4 " + (activeTab === 1 || activeTab === 2 ? "active" : "")
               }
             >
-              {loading && (
-                <Spinner
-                  variant="secondary"
-                  as="span"
-                  size="sm"
-                  animation="border"
-                  role="status"
-                />
-              )}{" "}
               Signup
             </div>
             <div
@@ -222,6 +204,15 @@ export default function LoginModal({ setShowToast }) {
               )}
             </Form.Group>
             <Container className="p-0 d-flex justify-content-between">
+              {loading && (
+                <Spinner
+                  variant="secondary"
+                  as="span"
+                  size="sm"
+                  animation="border"
+                  role="status"
+                />
+              )}{" "}
               <Button type="submit" variant="primary">
                 Login
               </Button>
@@ -309,6 +300,15 @@ export default function LoginModal({ setShowToast }) {
                 variant="primary"
                 onClick={handleSignupSubmit(signupSubmit)}
               >
+                {loading && (
+                  <Spinner
+                    variant="secondary"
+                    as="span"
+                    size="sm"
+                    animation="border"
+                    role="status"
+                  />
+                )}{" "}
                 Submit
               </Button>
               <Button variant="secondary" onClick={handleClose}>

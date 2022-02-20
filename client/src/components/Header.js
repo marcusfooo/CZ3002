@@ -56,7 +56,9 @@ export default function Header() {
               />
             </Navbar.Brand>
           </Col>
-          <Col>{location.pathname !== "/" && <FilterForm />}</Col>
+          <Col>
+            {location.pathname !== "/" && <FilterForm inHeader={true} />}
+          </Col>
           <Col md="auto" className="d-flex align-items-center">
             <Navbar.Toggle className="mt-2" aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
@@ -74,7 +76,7 @@ export default function Header() {
                   id="basic-nav-dropdown"
                 >
                   {currentUser ? (
-                    <NavDropdown.Item href="#action/3.1">
+                    <NavDropdown.Item href="#">
                       Signed in as: {currentUser.email.split("@")[0]}
                     </NavDropdown.Item>
                   ) : (
@@ -83,9 +85,7 @@ export default function Header() {
                   {currentUser && (
                     <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                   )}
-                  <NavDropdown.Item href="#action/3.3">
-                    Something
-                  </NavDropdown.Item>
+                  <NavDropdown.Item href="/chat">My Chats</NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item href="#action/3.4">
                     Separated link

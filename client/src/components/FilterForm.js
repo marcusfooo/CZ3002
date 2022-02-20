@@ -40,7 +40,7 @@ const selectStyles = {
   }),
 };
 
-export default function FilterForm() {
+export default function FilterForm({ inHeader }) {
   const { handleSubmit, control } = useForm();
   const navigate = useNavigate();
 
@@ -67,8 +67,11 @@ export default function FilterForm() {
   ];
 
   return (
-    <Form className="searchForm" onSubmit={handleSubmit(onSearch)}>
-      <Container fluid="lg" className="form-container">
+    <Form className="my-1" onSubmit={handleSubmit(onSearch)}>
+      <Container
+        fluid="lg"
+        className={"form-container" + (inHeader ? " py-1" : "")}
+      >
         <Row>
           <Col md={5} sm={4} className="field">
             <Controller
@@ -131,7 +134,7 @@ export default function FilterForm() {
             className="d-flex p-0 justify-content-end align-items-center"
           >
             <Button type="submit" className="search-button">
-              <AiOutlineSearch size={"1.5em"} />
+              <AiOutlineSearch size={"1.5rem"} />
             </Button>
           </Col>
         </Row>

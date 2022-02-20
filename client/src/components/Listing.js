@@ -43,6 +43,7 @@ export default function Listing() {
   const [listingData, setListingData] = useState();
   const [images, setImages] = useState([]);
   const [listingBids, setListingBids] = useState([]);
+  const [topBid, setTopBid] = useState({});
   const [myBid, setMyBid] = useState({});
   const [highestBid, setHighestBid] = useState();
   const [loading, setLoading] = useState(true);
@@ -54,29 +55,36 @@ export default function Listing() {
 
   useEffect(() => {
     async function getListingData() {
-      setLoading(true);
-      const res = await axios.get(`/api/listing/${listingId}`);
-      //get bidding data if user is the lister
-      if (res.data?.listing.seller.email === currentUser?.email) {
-        const bids = await axios.get(`/api/bids/listing/${listingId}`, {
-          withCredentials: true,
-        });
-        setListingBids(bids.data.bids);
-        const bidControls = {};
-        bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
-        setOpenBidModal(bidControls);
-      } else if (currentUser) {
-        //get own bid if not lister
-        const res = await axios.get(`/api/bids/listing/${listingId}`, {
-          withCredentials: true,
-        });
-        console.log(res);
-        setMyBid(res.data?.bid);
-        setHighestBid(res.data?.highest?.amount);
-        setValue("amount", res.data?.bid?.amount);
+      try {
+        setLoading(true);
+        const res = await axios.get(`/api/listing/${listingId}`);
+        //get bidding data if user is the lister
+        if (res.data?.listing.seller.email === currentUser?.email) {
+          const bids = await axios.get(`/api/bids/listing/${listingId}`, {
+            withCredentials: true,
+          });
+          setTopBid(bids.data.bids);
+          if (bids.data.bids?.length > 1) {
+            setListingBids(bids.data.bids.slice(1, bids.data.bis.length));
+          }
+          const bidControls = {};
+          bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
+          setOpenBidModal(bidControls);
+        } else if (currentUser) {
+          //get own bid if not lister
+          const res = await axios.get(`/api/bids/listing/${listingId}`, {
+            withCredentials: true,
+          });
+          console.log(res);
+          setMyBid(res.data?.bid);
+          setHighestBid(res.data?.highest?.amount);
+          setValue("amount", res.data?.bid?.amount);
+        }
+        setImages(res.data.listing.images);
+        setListingData(res.data.listing);
+      } catch (error) {
+        console.error(error);
       }
-      setImages(res.data.listing.images);
-      setListingData(res.data.listing);
       setLoading(false);
     }
     getListingData();
@@ -186,13 +194,41 @@ export default function Listing() {
             ) : currentUser &&
               currentUser.email === listingData?.seller.email ? (
               <Card.Body>
-                <p>Current bids</p>
-                <div>
+                <p>Top Bidder</p>
+                {topBid && Object.keys(topBid).length > 0 && (
+                  <div>
+                    <BidModal
+                      id={topBid.id}
+                      idx={0}
+                      open={openBidModal}
+                      setOpenBidModal={setOpenBidModal}
+                      bidder={topBid.bidder.email}
+                      amount={topBid.amount}
+                      closeListing={closeListing}
+                    />
+                    <div
+                      type="button"
+                      onClick={() => {
+                        setOpenBidModal({ ...openBidModal, 0: true });
+                      }}
+                    >
+                      <p
+                        className={`${
+                          topBid.status === "rejected" ? "text-danger" : ""
+                        }`}
+                      >
+                        {topBid.bidder.email} placed ${topBid.amount}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <hr />
+                <div className="bids-box">
                   {listingBids.map((bid, idx) => (
                     <div key={idx}>
                       <BidModal
                         id={bid.id}
-                        idx={idx}
+                        idx={idx + 1}
                         open={openBidModal}
                         setOpenBidModal={setOpenBidModal}
                         bidder={bid.bidder.email}
@@ -202,7 +238,7 @@ export default function Listing() {
                       <div
                         type="button"
                         onClick={() => {
-                          setOpenBidModal({ ...openBidModal, [idx]: true });
+                          setOpenBidModal({ ...openBidModal, [idx + 1]: true });
                         }}
                       >
                         <p
