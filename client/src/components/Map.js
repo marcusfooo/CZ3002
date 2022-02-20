@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import ReactDOMServer from "react-dom/server";
+import Card from "react-bootstrap/Card";
+import { useNavigate } from "react-router-dom";
+import Container from "react-bootstrap/esm/Container";
+import Image from "react-bootstrap/Image";
 
 function customIcon(price) {
   return L.divIcon({
@@ -33,8 +37,9 @@ const getCoords = async (listing) => {
   }
 };
 
-export default function Map({ listings }) {
+export default function Map({ listings, setSelectedListing }) {
   const [coords, setCoords] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function coordsWrapper() {
@@ -70,7 +75,24 @@ export default function Map({ listings }) {
           icon={customIcon(listings[idx]?.price)}
         >
           <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
+            <Container
+              onClick={() => navigate(`/listing/${listings[idx]?.id}`)}
+              fluid
+              style={{ width: "18rem", padding: "0.5rem", cursor: "pointer" }}
+            >
+              <Image
+                fluid
+                rounded
+                variant="top"
+                src={`https://cz2006-bucket.s3.ap-southeast-1.amazonaws.com/${listings[idx]?.images[0]?.file_name}`}
+              />
+              <h5>{listings[idx]?.title}</h5>
+              <h6>
+                {listings[idx]?.isRoom ? "Individual Rooms" : "Whole Unit"}{" "}
+                &bull;
+                {listings[idx]?.numRooms} rooms
+              </h6>
+            </Container>
           </Popup>
         </Marker>
       ))}

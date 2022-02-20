@@ -82,14 +82,11 @@ export default function Header() {
                   ) : (
                     <LoginModal setShowToast={setShowToast} />
                   )}
+                  <NavDropdown.Item href="/chat">My Chats</NavDropdown.Item>
+                  {currentUser && <NavDropdown.Divider />}
                   {currentUser && (
                     <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
                   )}
-                  <NavDropdown.Item href="/chat">My Chats</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item href="#action/3.4">
-                    Separated link
-                  </NavDropdown.Item>
                 </NavDropdown>
               </Nav>
             </Navbar.Collapse>

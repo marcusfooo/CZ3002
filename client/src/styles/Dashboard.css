@@ -48,6 +48,10 @@
   height: 100%;
 }
 
+.leaflet-popup-content {
+  margin: 0.5rem 0;
+}
+
 .custom-icon {
   background-color: var(--accent);
   width: auto !important;

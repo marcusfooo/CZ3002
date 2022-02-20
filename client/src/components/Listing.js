@@ -47,6 +47,7 @@ export default function Listing() {
   const [myBid, setMyBid] = useState({});
   const [highestBid, setHighestBid] = useState();
   const [loading, setLoading] = useState(true);
+  const [bidLoading, setBidLoading] = useState(false);
   const { currentUser } = useUser();
   const navigate = useNavigate();
   const { register, handleSubmit, setValue } = useForm();
@@ -63,7 +64,9 @@ export default function Listing() {
           const bids = await axios.get(`/api/bids/listing/${listingId}`, {
             withCredentials: true,
           });
-          setTopBid(bids.data.bids);
+          if (bids.data.bids?.length > 0) {
+            setTopBid(bids.data.bids[0]);
+          }
           if (bids.data.bids?.length > 1) {
             setListingBids(bids.data.bids.slice(1, bids.data.bis.length));
           }
@@ -91,11 +94,17 @@ export default function Listing() {
   }, [listingId, currentUser, setValue]);
 
   async function placeBid(data) {
-    const res = await axios.post(`/api/bids/listing/${listingId}`, data, {
-      withCredentials: true,
-    });
-    setMyBid(data);
-    setShowAlert(true);
+    try {
+      setBidLoading(true);
+      await axios.post(`/api/bids/listing/${listingId}`, data, {
+        withCredentials: true,
+      });
+      setMyBid(data);
+      setShowAlert(true);
+    } catch (error) {
+      console.error(error);
+    }
+    setBidLoading(false);
   }
 
   async function closeListing(id) {
@@ -217,7 +226,8 @@ export default function Listing() {
                           topBid.status === "rejected" ? "text-danger" : ""
                         }`}
                       >
-                        {topBid.bidder.email} placed ${topBid.amount}
+                        {topBid.bidder.email.split("@")[0]} placed $
+                        {topBid.amount}
                       </p>
                     </div>
                   </div>
@@ -282,6 +292,15 @@ export default function Listing() {
                     className="w-100 mt-2"
                     type="submit"
                   >
+                    {bidLoading && (
+                      <Spinner
+                        variant="secondary"
+                        as="span"
+                        size="sm"
+                        animation="border"
+                        role="status"
+                      />
+                    )}{" "}
                     {currentUser ? "Place Bid" : "Login to Bid"}
                   </Button>
                 </Form>

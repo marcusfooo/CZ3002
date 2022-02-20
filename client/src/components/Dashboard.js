@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDropdown, setOpenDropdown] = useState(false);
   const [listings, setListings] = useState([]);
+  const [selectedListing, setSelectedListing] = useState();
 
   useEffect(() => {
     async function getListings() {
@@ -47,6 +48,7 @@ export default function Dashboard() {
       </Row>
       <Row className="dashboard-main">
         <Col sm={7} className="list">
+          {selectedListing && <ListingCard {...selectedListing} />}
           {listings.length === 0 && (
             <div className="text-center">No listings found.</div>
           )}
@@ -55,7 +57,7 @@ export default function Dashboard() {
           ))}
         </Col>
         <Col className="p-0">
-          <Map listings={listings} />
+          <Map setSelectedListing={setSelectedListing} listings={listings} />
         </Col>
       </Row>
     </Container>
