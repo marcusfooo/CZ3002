@@ -37,7 +37,7 @@ const getCoords = async (listing) => {
   }
 };
 
-export default function Map({ listings, setSelectedListing }) {
+export default function Map({ listings }) {
   const [coords, setCoords] = useState([]);
   const navigate = useNavigate();
 

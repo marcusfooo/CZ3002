@@ -11,6 +11,7 @@ import { ChatEngineWrapper } from "react-chat-engine";
 import Dashboard from "./Dashboard";
 import VerifyEmail from "./VerifyEmail";
 import RequireAuth from "./RequireAuth";
+import Profile from "./Profile";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/listing" element={<Dashboard />} />
               <Route path="/listing/:listingId" element={<Listing />} />
               <Route element={<RequireAuth />}>
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/create-listing" element={<NewListing />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/chat/:chatId" element={<Chat />} />

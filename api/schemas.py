@@ -31,3 +31,11 @@ class BiddingSchema(ma.SQLAlchemyAutoSchema):
     status = EnumField(ListingStatusEnum)
     bidder = ma.Nested(UserSchema(only=("email",)))
     listing = ma.Nested(ListingSchema(only=("id",)))
+
+
+class BiddingAndListingSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Bid
+    status = EnumField(ListingStatusEnum)
+    bidder = ma.Nested(UserSchema(only=("email",)))
+    listing = ma.Nested(ListingSchema)

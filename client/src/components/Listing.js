@@ -59,6 +59,10 @@ export default function Listing() {
       try {
         setLoading(true);
         const res = await axios.get(`/api/listing/${listingId}`);
+        const highestBidRes = await axios.get(
+          `/api/bids/listing/${listingId}/highest`
+        );
+        setHighestBid(highestBidRes.data?.highest?.amount);
         //get bidding data if user is the lister
         if (res.data?.listing.seller.email === currentUser?.email) {
           const bids = await axios.get(`/api/bids/listing/${listingId}`, {
@@ -75,13 +79,11 @@ export default function Listing() {
           setOpenBidModal(bidControls);
         } else if (currentUser) {
           //get own bid if not lister
-          const res = await axios.get(`/api/bids/listing/${listingId}`, {
+          const bidRes = await axios.get(`/api/bids/listing/${listingId}`, {
             withCredentials: true,
           });
-          console.log(res);
-          setMyBid(res.data?.bid);
-          setHighestBid(res.data?.highest?.amount);
-          setValue("amount", res.data?.bid?.amount);
+          setMyBid(bidRes.data?.bid);
+          setValue("amount", bidRes.data?.bid?.amount);
         }
         setImages(res.data.listing.images);
         setListingData(res.data.listing);

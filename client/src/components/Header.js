@@ -82,6 +82,7 @@ export default function Header() {
                   ) : (
                     <LoginModal setShowToast={setShowToast} />
                   )}
+                  <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
                   <NavDropdown.Item href="/chat">My Chats</NavDropdown.Item>
                   {currentUser && <NavDropdown.Divider />}
                   {currentUser && (

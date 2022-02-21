@@ -23,7 +23,7 @@ auth_s = URLSafeSerializer("secret key")
 @auth.route("/user", methods=["GET"])
 @login_required
 def get_user():
-    return make_response(jsonify({"id": current_user.id, "email": current_user.email, "password": current_user.password}))
+    return make_response(jsonify({"id": current_user.id, "email": current_user.email, "password": current_user.password, "picture": current_user.profile_picture}))
 
 
 @auth.route('/login', methods=['POST'])

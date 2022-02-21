@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from api.models.bid import Bid
 from api.models.listing import Listing
-from api.schemas import BiddingSchema
+from api.schemas import BiddingAndListingSchema, BiddingSchema
 from . import db
 
 bid = Blueprint('bid', __name__)
@@ -15,13 +15,12 @@ def get_bids(listing_id):
     # verify if user is the owner of the listing
     listing = Listing.query.filter(
         Listing.id == listing_id, Listing.seller_id == current_user.id).first()
+    # get own bid data if not owner
     if listing is None:
         bid_schema = BiddingSchema()
         bid = Bid.query.filter_by(listing_id=listing_id,
                                   bidder_id=current_user.id)
-        bids = Bid.query.filter_by(
-            listing_id=listing_id).order_by(Bid.amount.desc())
-        return make_response(jsonify({"bid": bid_schema.dump(bid.first()), "highest": bid_schema.dump(bids.first())}), 200)
+        return make_response(jsonify({"bid": bid_schema.dump(bid.first())}), 200)
 
     bids = Bid.query.filter_by(
         listing_id=listing_id).order_by(Bid.amount.desc())
@@ -30,11 +29,19 @@ def get_bids(listing_id):
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)
 
 
+@bid.route("/bids/listing/<int:listing_id>/highest", methods=["GET"])
+def get_highest_bid(listing_id):
+    bid_schema = BiddingSchema()
+    bids = Bid.query.filter_by(
+        listing_id=listing_id).order_by(Bid.amount.desc())
+    return make_response(jsonify({"highest": bid_schema.dump(bids.first())}), 200)
+
+
 @bid.route("/bids/user/<int:user_id>", methods=["GET"])
 @login_required
 def get_own_bids(user_id):
     bids = Bid.query.filter_by(bidder_id=user_id)
-    bidding_schema = BiddingSchema(many=True)
+    bidding_schema = BiddingAndListingSchema(many=True)
 
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)
 

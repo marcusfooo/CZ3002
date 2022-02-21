@@ -70,3 +70,12 @@ def post_listing():
     db.session.add(new_listing)
     db.session.commit()
     return make_response(jsonify({"message": "Successfully created new listing", "id": new_listing.id}), 200)
+
+
+@listing.route("/listing/user", methods=["GET"])
+@login_required
+def get_my_listings():
+    listing_schema = ListingSchema(many=True)
+    listings = Listing.query.filter_by(seller_id=current_user.id)
+
+    return make_response(jsonify({"listings": listing_schema.dump(listings.all())}), 200)

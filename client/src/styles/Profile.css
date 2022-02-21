@@ -1,0 +1,7 @@
+.mytabs {
+  color: black;
+}
+.mytabs.active {
+  color: var(--accentdark) !important;
+  font-weight: 600;
+}

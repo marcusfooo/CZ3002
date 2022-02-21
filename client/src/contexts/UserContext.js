@@ -22,6 +22,7 @@ export function UserProvider({ children }) {
           id: res.data.id,
           email: res.data.email,
           password: res.data.password,
+          picture: res.data.picture,
         });
         setLoading(false);
       } catch (err) {
