@@ -18,12 +18,12 @@ def get_bids(listing_id):
     # get own bid data if not owner
     if listing is None:
         bid_schema = BiddingSchema()
-        bid = Bid.query.filter_by(listing_id=listing_id,
-                                  bidder_id=current_user.id)
+        bid = Bid.query.filter(Bid.listing_id == listing_id,
+                               Bid.bidder_id == current_user.id, Bid.status != "rejected")
         return make_response(jsonify({"bid": bid_schema.dump(bid.first())}), 200)
 
-    bids = Bid.query.filter_by(
-        listing_id=listing_id).order_by(Bid.amount.desc())
+    bids = Bid.query.filter(
+        Bid.listing_id == listing_id).order_by(Bid.amount.desc())
     bidding_schema = BiddingSchema(many=True)
 
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)
@@ -40,7 +40,7 @@ def get_highest_bid(listing_id):
 @bid.route("/bids/user/<int:user_id>", methods=["GET"])
 @login_required
 def get_own_bids(user_id):
-    bids = Bid.query.filter_by(bidder_id=user_id)
+    bids = Bid.query.filter_by(bidder_id=user_id).order_by(Bid.date.desc())
     bidding_schema = BiddingAndListingSchema(many=True)
 
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)
@@ -69,6 +69,8 @@ def update_bid_status(bid_id):
     if status == "approved":
         listing = Listing.query.filter_by(id=bid.listing_id).first()
         listing.status = "closed"
+        Bid.query.filter_by(listing_id=bid.listing_id).update(
+            {Bid.status: "rejected"})
     bid.status = status
     db.session.commit()
     return make_response(jsonify({"message": "Successfully updated status"}), 200)

@@ -18,7 +18,9 @@ export default function Dashboard() {
   useEffect(() => {
     async function getListings() {
       const res = await axios.get("/api/listing?" + searchParams);
-      setListings(res.data.listings);
+      setListings(
+        res.data.listings.filter((listing) => listing.status !== "closed")
+      );
       console.log(res);
     }
     getListings();

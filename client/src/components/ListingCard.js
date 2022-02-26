@@ -6,15 +6,20 @@ import Carousel from "react-bootstrap/Carousel";
 import Row from "react-bootstrap/esm/Row";
 import "../styles/ListingCard.css";
 import { useNavigate } from "react-router-dom";
+import { formatTimeAgo } from "../utils";
 
 export default function ListingCard({
   id,
+  created_at,
   images,
   title,
   location,
   isRoom,
   numRooms,
   price,
+  bidDate,
+  bidAmt,
+  bidStatus,
 }) {
   const navigate = useNavigate();
   return (
@@ -38,7 +43,14 @@ export default function ListingCard({
           onClick={() => navigate({ pathname: `/listing/${id}` })}
         >
           <Row className="h-100">
-            <h5 className="p-0 m-0">{title}</h5>
+            <div className="d-flex p-0">
+              <h5 className="p-0 m-0">{title}</h5>
+              {bidDate ? (
+                <span className="ms-auto">{formatTimeAgo(bidDate)}</span>
+              ) : (
+                <span className="ms-auto">{formatTimeAgo(created_at)}</span>
+              )}
+            </div>
             <span className="p-0">{location}</span>
             <hr className="m-0" />
             <ul>
@@ -46,6 +58,20 @@ export default function ListingCard({
               <li>{numRooms} bedrooms</li>
             </ul>
             <span className="mt-auto text-end">{price} SGD/mo</span>
+            {bidAmt && (
+              <div
+                className={
+                  "d-flex align-items-center justify-content-end text-white w-50 ms-auto rounded " +
+                  (bidStatus === "approved"
+                    ? "bg-success"
+                    : bidStatus === "rejected"
+                    ? "bg-danger"
+                    : "bg-secondary")
+                }
+              >
+                {bidAmt} SGD/mo {bidStatus}
+              </div>
+            )}
           </Row>
         </Col>
       </Row>

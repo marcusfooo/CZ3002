@@ -53,6 +53,8 @@ export default function Listing() {
   const { register, handleSubmit, setValue } = useForm();
   const [openBidModal, setOpenBidModal] = useState({});
   const [showAlert, setShowAlert] = useState(false);
+  const [showAcceptBidSuccess, setShowAcceptBidSuccess] = useState(false);
+  const [showRejectBidSuccess, setShowRejectBidSuccess] = useState(false);
 
   useEffect(() => {
     async function getListingData() {
@@ -72,7 +74,11 @@ export default function Listing() {
             setTopBid(bids.data.bids[0]);
           }
           if (bids.data.bids?.length > 1) {
-            setListingBids(bids.data.bids.slice(1, bids.data.bis.length));
+            setListingBids(
+              bids.data.bids
+                .slice(1, bids.data.bids.length)
+                .filter((bid) => bid.status !== "rejected")
+            );
           }
           const bidControls = {};
           bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
@@ -109,13 +115,9 @@ export default function Listing() {
     setBidLoading(false);
   }
 
-  async function closeListing(id) {
-    const res = await axios.put(
-      `/api/bids/${id}`,
-      { status: "approved" },
-      { withCredentials: true }
-    );
+  async function closeListing() {
     setListingData({ ...listingData, status: "closed" });
+    setShowAcceptBidSuccess(true);
   }
 
   if (loading) {
@@ -139,6 +141,36 @@ export default function Listing() {
           <Toast.Header>
             <h6 className="me-auto text-black text-center">
               Successfully placed bid!
+            </h6>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer>
+      <ToastContainer position="top-center">
+        <Toast
+          onClose={() => setShowAcceptBidSuccess(false)}
+          bg="success"
+          delay={5000}
+          autohide
+          show={showAcceptBidSuccess}
+        >
+          <Toast.Header>
+            <h6 className="me-auto text-black text-center">
+              Congratulations! Your listing is marked as sold.
+            </h6>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer>
+      <ToastContainer position="top-center">
+        <Toast
+          onClose={() => setShowRejectBidSuccess(false)}
+          bg="success"
+          delay={5000}
+          autohide
+          show={showRejectBidSuccess}
+        >
+          <Toast.Header>
+            <h6 className="me-auto text-black text-center">
+              You have rejected this bid.
             </h6>
           </Toast.Header>
         </Toast>
@@ -196,11 +228,13 @@ export default function Listing() {
           </Row>
         </Col>
         <Col>
-          <Card>
+          <Card className="bid-box">
             {listingData.status === "closed" ? (
               <Card.Body>
                 <p>{listingData.seller.email}</p>
-                <Button className="w-100">Sold</Button>
+                <Button className="w-100" disabled>
+                  Sold
+                </Button>
               </Card.Body>
             ) : currentUser &&
               currentUser.email === listingData?.seller.email ? (
@@ -216,6 +250,8 @@ export default function Listing() {
                       bidder={topBid.bidder.email}
                       amount={topBid.amount}
                       closeListing={closeListing}
+                      listingBids={listingBids}
+                      setListingBids={setListingBids}
                     />
                     <div
                       type="button"
@@ -235,7 +271,7 @@ export default function Listing() {
                   </div>
                 )}
                 <hr />
-                <div className="bids-box">
+                <div className="bid-list">
                   {listingBids.map((bid, idx) => (
                     <div key={idx}>
                       <BidModal
@@ -246,6 +282,8 @@ export default function Listing() {
                         bidder={bid.bidder.email}
                         amount={bid.amount}
                         closeListing={closeListing}
+                        listingBids={listingBids}
+                        setListingBids={setListingBids}
                       />
                       <div
                         type="button"
@@ -253,12 +291,8 @@ export default function Listing() {
                           setOpenBidModal({ ...openBidModal, [idx + 1]: true });
                         }}
                       >
-                        <p
-                          className={`${
-                            bid.status === "rejected" ? "text-danger" : ""
-                          }`}
-                        >
-                          {bid.bidder.email} placed ${bid.amount}
+                        <p>
+                          {bid.bidder.email.split("@")[0]} placed ${bid.amount}
                         </p>
                       </div>
                     </div>

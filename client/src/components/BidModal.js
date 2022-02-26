@@ -16,6 +16,8 @@ export default function BidModal({
   bidder,
   amount,
   closeListing,
+  listingBids,
+  setListingBids,
 }) {
   const { currentUser } = useUser();
   const navigate = useNavigate();
@@ -25,13 +27,22 @@ export default function BidModal({
     setOpenBidModal(newRules);
   };
   const updateBidStatus = async (status) => {
-    const res = await axios.put(
-      `/api/bids/${id}`,
-      { status: status },
-      { withCredentials: true }
-    );
-    closeModal(idx);
+    try {
+      await axios.put(
+        `/api/bids/${id}`,
+        { status: status },
+        { withCredentials: true }
+      );
+      if (status === "rejected") {
+        const temp = listingBids.filter((bid) => bid.id !== id);
+        setListingBids(temp);
+      }
+      closeModal(idx);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   return (
     <Modal
       centered
@@ -58,7 +69,10 @@ export default function BidModal({
           <Button
             className="me-2"
             variant="success"
-            onClick={() => closeListing(id)}
+            onClick={() => {
+              updateBidStatus("approved");
+              closeListing();
+            }}
           >
             <AiOutlineCheck size={"1.5rem"} />
           </Button>

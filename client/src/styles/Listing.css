@@ -17,6 +17,27 @@
   grid-column: span 2 / auto;
 }
 
-.bids-box {
+.bid-box {
+  overflow: hidden;
+  max-height: 250px;
+}
+
+.bid-list {
   overflow-y: scroll;
+}
+
+.bid-list::-webkit-scrollbar {
+  width: 0.25em;
+}
+
+.bid-list::-webkit-scrollbar-track {
+  background-color: hsl(204 8% 76%);
+  margin-block: 0.5em;
+  border-radius: 100vw;
+}
+
+.bid-list::-webkit-scrollbar-thumb {
+  background-color: hsl(204 8% 56%);
+  margin-block: 0.5em;
+  border-radius: 100vw;
 }
