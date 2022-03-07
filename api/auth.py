@@ -19,7 +19,6 @@ load_dotenv(os.path.join(BASEDIR, '.env'))
 
 auth_s = URLSafeSerializer("secret key")
 
-
 @auth.route("/user", methods=["GET"])
 @login_required
 def get_user():
