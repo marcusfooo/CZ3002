@@ -83,7 +83,7 @@ def signup_post():
     if os.environ["FLASK_ENV"] == "prod":
         link = ""
     else:
-        link = f"http://{prod_path}:3000/confirm-email/{token}"
+        link = f"http://{dev_path}:3000/confirm-email/{token}"
 
     msg.body = 'Your link is {}'.format(link)
 
@@ -127,7 +127,7 @@ def send_confirm_email():
     if os.environ["FLASK_ENV"] == "prod":
         link = ""
     else:
-        link = f"http://{prod_path}:3000/confirm-email/{token}"
+        link = f"http://{dev_path}:3000/confirm-email/{token}"
 
     msg.body = 'Your link is {}'.format(link)
 
