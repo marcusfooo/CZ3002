@@ -4,6 +4,5 @@ WORKDIR /frontend
 COPY package.json /frontend/package.json
 
 RUN npm install
-RUN npm install -g sass
-RUN npm install node-sass --save
+RUN npm i sass --save-dev
 RUN npm rebuild node-sass
