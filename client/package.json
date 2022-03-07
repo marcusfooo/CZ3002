@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://api:5000",
+  "proxy": "http://0.0.0.0:8080",
   "dependencies": {
     "@hookform/resolvers": "^2.8.8",
     "aws-sdk": "^2.1067.0",
