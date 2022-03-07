@@ -75,7 +75,8 @@ def create_app():
         return """
         <!DOCTYPE html>
         <html>
-        <head><title>Backend hit successfully!</title></head>
+        <head><title>Hello</title></head>
+        <body><h1>Backend hit successfully!</h1></body>
         </html>
         """, 200
     # blueprint for auth routes in our app
