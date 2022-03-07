@@ -11,9 +11,11 @@ from itsdangerous import SignatureExpired, URLSafeSerializer
 
 auth = Blueprint('auth', __name__)
 
+prod_path = "www.rentsg.software"
+dev_path = "localhost"
+
 # Get the path to the directory this file is in
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
-
 # Connect the path with your '.env' file name
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
@@ -81,7 +83,7 @@ def signup_post():
     if os.environ["FLASK_ENV"] == "prod":
         link = ""
     else:
-        link = "http://localhost:3000/confirm-email/{}".format(token)
+        link = f"http://{prod_path}:3000/confirm-email/{token}"
 
     msg.body = 'Your link is {}'.format(link)
 
@@ -125,7 +127,7 @@ def send_confirm_email():
     if os.environ["FLASK_ENV"] == "prod":
         link = ""
     else:
-        link = "http://localhost:3000/confirm-email/{}".format(token)
+        link = f"http://{prod_path}:3000/confirm-email/{token}"
 
     msg.body = 'Your link is {}'.format(link)
 
