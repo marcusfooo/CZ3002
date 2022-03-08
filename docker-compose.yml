@@ -36,8 +36,8 @@ services:
             - api
             - client
         volumes:
-            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-            - client_build:/var/www/client
+            - ./nginx/nginx-setup.conf:/etc/nginx/conf.d/default.conf:ro
+            - client_build:/var/www/frontend
         ports:
             - "8080:80"
 
