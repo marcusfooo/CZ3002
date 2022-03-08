@@ -4,3 +4,5 @@ WORKDIR /frontend
 COPY package.json package-lock.json ./
 RUN npm ci
 RUN npm i sass --save-dev
+EXPOSE 3000
+CMD [ "npm", "start" ]
