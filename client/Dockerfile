@@ -5,4 +5,4 @@ COPY package.json /frontend/package.json
 
 RUN npm install
 RUN npm i sass --save-dev
-
+RUN npm i react-scripts
