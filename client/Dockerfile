@@ -1,4 +1,4 @@
-FROM node:10.15.2-alpine
+FROM node:15.13-alpine
 RUN mkdir /frontend
 WORKDIR /frontend
 COPY package.json package-lock.json ./
