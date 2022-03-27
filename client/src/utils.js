@@ -1,3 +1,5 @@
+import axios from "./axios";
+
 const dict = {
   "ANG MO KIO": 221.00733276174975,
   BEDOK: 178.950997831084,
@@ -33,13 +35,29 @@ const dict = {
 
 const b = 733.84482383;
 
-export function getRecommendation(location, room) {
-  return Math.round(
-    b +
-      (location.toUpperCase in dict ? dict[location.toUpperCase()] : 0) +
-      (room in dict ? dict[room] : 0)
-  );
-}
+// export function getRecommendation(location, room) {
+//   return Math.round(
+//     b +
+//       (location.toUpperCase in dict ? dict[location.toUpperCase()] : 0) +
+//       (room in dict ? dict[room] : 0)
+//   );
+// }
+
+export const getRecommendation = async (location, room) => {
+  const finalData = {
+    'town':location.toUpperCase ,
+    'room': room.toUpperCase,
+  };
+  try {
+    const res = await axios.post("/api/model", finalData, {
+      withCredentials: true,
+    });
+    var value = parseFloat(res)
+    return value
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 // date is an ISOString with zero UTC offset
 export function formatTimeAgo(date) {

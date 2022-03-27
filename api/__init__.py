@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
@@ -7,6 +7,10 @@ from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from dotenv import load_dotenv
 from flask_mail import Mail
+import joblib
+import pandas as pd
+import boto3
+
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -79,6 +83,34 @@ def create_app():
         <body><h1>Backend hit successfully!</h1></body>
         </html>
         """, 200
+
+    @app.route('/model')
+    def model():
+        model_filename = 'lgb_cz2006.pkl'
+        model_path = f"models/{model_filename}"
+
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket('cz2006-bucket')
+        bucket.download_file(f'model/{model_filename}', model_path)
+        gbm_pickle = joblib.load(model_path)
+        res = pd.DataFrame(columns=['town', 'flat_type']) 
+        try:
+            town = request.args['town']
+            flat_type = request.args['flat_type']
+            res.loc[0] = [town,flat_type]
+            for c in res.columns:
+                res[c] = res[c].astype('category')
+            pred = gbm_pickle.predict(res)[0]
+            return str(pred)
+        except:
+             return """
+        <!DOCTYPE html>
+        <html>
+        <head><title>Hello</title></head>
+        <body><h1>Error with model inputs</h1></body>
+        </html>
+        """, 200
+
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix="/api")
