@@ -1,4 +1,4 @@
-FROM node:latest as builder
+FROM node:16.4.2 as builder
 RUN mkdir /frontend
 WORKDIR /frontend
 COPY . .
