@@ -1,4 +1,4 @@
-FROM node:15.13-alpine as builder
+FROM node:latest as builder
 RUN mkdir /frontend
 WORKDIR /frontend
 COPY . .
