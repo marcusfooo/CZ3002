@@ -7,10 +7,9 @@ from flask_login import LoginManager
 from flask_marshmallow import Marshmallow
 from dotenv import load_dotenv
 from flask_mail import Mail
+import boto3
 import joblib
 import pandas as pd
-import boto3
-
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
@@ -23,6 +22,12 @@ mail = Mail()
 def create_app():
     app = Flask(__name__)
 
+    s3 = boto3.resource('s3')
+    model_filename = 'lgb_cz2006.pkl'
+    model_path = f"models/{model_filename}"
+    bucket = s3.Bucket('cz2006-bucket')
+    bucket.download_file(f'model/{model_filename}', model_path)
+    
     app.config["APPLICATION_ROOT"] = "/api"
     CORS(app, supports_credentials=True)
     app.config['SECRET_KEY'] = 'secret-key-goes-here'
@@ -84,33 +89,32 @@ def create_app():
         </html>
         """, 200
 
-    @app.route('/model')
-    def model():
-        model_filename = 'lgb_cz2006.pkl'
-        model_path = f"models/{model_filename}"
+    # @app.route('/model', methods=["GET", "POST"])
+    # def model_req():
+    #     model_filename = 'lgb_cz2006.pkl'
+    #     model_path = f"models/{model_filename}"
 
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket('cz2006-bucket')
-        bucket.download_file(f'model/{model_filename}', model_path)
-        gbm_pickle = joblib.load(model_path)
-        res = pd.DataFrame(columns=['town', 'flat_type']) 
-        try:
-            town = request.args['town']
-            flat_type = request.args['flat_type']
-            res.loc[0] = [town,flat_type]
-            for c in res.columns:
-                res[c] = res[c].astype('category')
-            pred = gbm_pickle.predict(res)[0]
-            return str(pred)
-        except:
-             return """
-        <!DOCTYPE html>
-        <html>
-        <head><title>Hello</title></head>
-        <body><h1>Error with model inputs</h1></body>
-        </html>
-        """, 200
 
+    #     gbm_pickle = joblib.load(model_path)
+    #     res = pd.DataFrame(columns=['town', 'flat_type']) 
+    #     try:
+    #         town = request.args['town']
+    #         flat_type = request.args['flat_type']
+    #         res.loc[0] = [town,flat_type]
+    #         for c in res.columns:
+    #             res[c] = res[c].astype('category')
+    #         pred = gbm_pickle.predict(res)[0]
+    #         res_dict = {'pred':pred}
+    #         # return str(pred)
+    #         return jsonify({"listing": res_dict})
+    #     except:
+    #          return """
+    #     <!DOCTYPE html>
+    #     <html>
+    #     <head><title>Hello</title></head>
+    #     <body><h1>Error with model inputs</h1></body>
+    #     </html>
+    #     """, 200
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix="/api")
@@ -123,5 +127,8 @@ def create_app():
 
     from .bid import bid as bid_blueprint
     app.register_blueprint(bid_blueprint, url_prefix="/api")
+
+    from .model import model as model_blueprint
+    app.register_blueprint(model_blueprint, url_prefix="/api")
 
     return app

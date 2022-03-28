@@ -55,6 +55,7 @@ export default function Listing() {
   const [showAlert, setShowAlert] = useState(false);
   const [showAcceptBidSuccess, setShowAcceptBidSuccess] = useState(false);
   const [showRejectBidSuccess, setShowRejectBidSuccess] = useState(false);
+  const [rec, setRec] = useState();
 
   useEffect(() => {
     async function getListingData() {
@@ -119,6 +120,38 @@ export default function Listing() {
     setListingData({ ...listingData, status: "closed" });
     setShowAcceptBidSuccess(true);
   }
+  
+  const roomRef = {
+    1: '1-ROOM',
+    2: '2-ROOM',
+    3: '3-ROOM',
+    4: '4-ROOM',
+    5: '5-ROOM',
+    'EXECUTIVE':'EXECUTIVE'
+  }
+
+  async function getRecommendation (location, room) {
+    console.log('ROOM IS', room);
+    const parsedLocation = location.toUpperCase();
+    const parsedRoom = roomRef[room];
+    const finalData = {
+      'town':parsedLocation,
+      'flat_type': parsedRoom,
+    };
+    console.log(finalData)
+    try {
+      const res = await axios.post("/api/model", finalData, {
+        withCredentials: true,
+      });
+      var value = 999
+      value = parseFloat(res['data']['listing']['pred']);
+      console.log(value);
+      setRec(value);
+      return value;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (loading) {
     return (
@@ -127,9 +160,10 @@ export default function Listing() {
       </div>
     );
   }
-
   return (
-    <Container className="pb-5">
+    <Container className="pb-5"
+    getRecommendation={getRecommendation(listingData.location,
+      listingData.numRooms)}>
       <ToastContainer position="bottom-center">
         <Toast
           onClose={() => setShowAlert(false)}
@@ -209,10 +243,7 @@ export default function Listing() {
                 <span className="fw-bold ps-2">Recommended</span>
                 <h5 className="text-end mt-2">
                   $
-                  {getRecommendation(
-                    listingData.location,
-                    listingData.numRooms
-                  )}{" "}
+                  {rec}{" "}
                   SGD/mo
                 </h5>
               </div>
@@ -252,6 +283,7 @@ export default function Listing() {
                       closeListing={closeListing}
                       listingBids={listingBids}
                       setListingBids={setListingBids}
+                      getRecommendation={getRecommendation}
                     />
                     <div
                       type="button"

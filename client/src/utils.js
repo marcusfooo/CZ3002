@@ -36,6 +36,12 @@ const dict = {
 const b = 733.84482383;
 
 // export function getRecommendation(location, room) {
+//   const res = Math.round(
+//     b +
+//       (location.toUpperCase in dict ? dict[location.toUpperCase()] : 0) +
+//       (room in dict ? dict[room] : 0)
+//   );
+//   console.log(res, typeof(res));
 //   return Math.round(
 //     b +
 //       (location.toUpperCase in dict ? dict[location.toUpperCase()] : 0) +
@@ -43,21 +49,27 @@ const b = 733.84482383;
 //   );
 // }
 
-export const getRecommendation = async (location, room) => {
-  const finalData = {
-    'town':location.toUpperCase ,
-    'room': room.toUpperCase,
-  };
-  try {
-    const res = await axios.post("/api/model", finalData, {
-      withCredentials: true,
-    });
-    var value = parseFloat(res)
-    return value
-  } catch (error) {
-    console.error(error);
-  }
-};
+// export async function getRecommendation (location, room) {
+//   const finalData = {
+//     'town':location.toUpperCase ,
+//     'room': room.toUpperCase,
+//   };
+//   var value = 999
+//   console.log(value, typeof(value));
+//   try {
+//     const res = await axios.post("/api/model", finalData, {
+//       withCredentials: true,
+//     });
+    
+//     // value = parseFloat(res);
+//     console.log('HERE!');
+//     console.log(value);
+//     return value;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
 
 // date is an ISOString with zero UTC offset
 export function formatTimeAgo(date) {
