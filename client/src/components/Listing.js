@@ -42,6 +42,7 @@ export default function Listing() {
   const { listingId } = useParams();
   const [listingData, setListingData] = useState();
   const [images, setImages] = useState([]);
+  const [filteredBids, setFilteredBids] = useState([]);
   const [listingBids, setListingBids] = useState([]);
   const [topBid, setTopBid] = useState({});
   const [myBid, setMyBid] = useState({});
@@ -71,15 +72,15 @@ export default function Listing() {
           const bids = await axios.get(`/api/bids/listing/${listingId}`, {
             withCredentials: true,
           });
-          if (bids.data.bids?.length > 0) {
-            setTopBid(bids.data.bids[0]);
+          const filteredBids = bids.data.bids.filter(
+            (bid) => bid.status !== "rejected"
+          );
+          setFilteredBids(filteredBids);
+          if (filteredBids.length > 0) {
+            setTopBid(filteredBids[0]);
           }
-          if (bids.data.bids?.length > 1) {
-            setListingBids(
-              bids.data.bids
-                .slice(1, bids.data.bids.length)
-                .filter((bid) => bid.status !== "rejected")
-            );
+          if (filteredBids.length > 1) {
+            setListingBids(filteredBids.slice(1, filteredBids.length));
           }
           const bidControls = {};
           bids.data.bids.forEach((_, idx) => (bidControls[idx] = false));
@@ -116,42 +117,66 @@ export default function Listing() {
     setBidLoading(false);
   }
 
+  const updateBidStatus = async (id, status) => {
+    try {
+      await axios.put(
+        `/api/bids/${id}`,
+        { status: status },
+        { withCredentials: true }
+      );
+      if (status === "rejected") {
+        const updated = filteredBids.filter((bid) => bid.id !== id);
+        setFilteredBids(updated);
+        console.log(updated);
+        if (updated.length > 0) {
+          setTopBid(updated[0]);
+        }
+        if (updated.length > 1) {
+          setListingBids(updated.slice(1, updated.length));
+        }
+        setShowRejectBidSuccess(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   async function closeListing() {
     setListingData({ ...listingData, status: "closed" });
     setShowAcceptBidSuccess(true);
   }
-  
-  const roomRef = {
-    1: '1-ROOM',
-    2: '2-ROOM',
-    3: '3-ROOM',
-    4: '4-ROOM',
-    5: '5-ROOM',
-    'EXECUTIVE':'EXECUTIVE'
-  }
 
-  async function getRecommendation (location, room) {
-    console.log('ROOM IS', room);
+  const roomRef = {
+    1: "1-ROOM",
+    2: "2-ROOM",
+    3: "3-ROOM",
+    4: "4-ROOM",
+    5: "5-ROOM",
+    EXECUTIVE: "EXECUTIVE",
+  };
+
+  async function getRecommendation(location, room) {
+    console.log("ROOM IS", room);
     const parsedLocation = location.toUpperCase();
     const parsedRoom = roomRef[room];
     const finalData = {
-      'town':parsedLocation,
-      'flat_type': parsedRoom,
+      town: parsedLocation,
+      flat_type: parsedRoom,
     };
-    console.log(finalData)
+    console.log(finalData);
     try {
       const res = await axios.post("/api/model", finalData, {
         withCredentials: true,
       });
-      var value = 999
-      value = parseFloat(res['data']['listing']['pred']);
+      var value = 999;
+      value = parseFloat(res["data"]["listing"]["pred"]);
       console.log(value);
       setRec(value);
       return value;
     } catch (error) {
       console.error(error);
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -161,9 +186,13 @@ export default function Listing() {
     );
   }
   return (
-    <Container className="pb-5"
-    getRecommendation={getRecommendation(listingData.location,
-      listingData.numRooms)}>
+    <Container
+      className="pb-5"
+      getRecommendation={getRecommendation(
+        listingData.location,
+        listingData.numRooms
+      )}
+    >
       <ToastContainer position="bottom-center">
         <Toast
           onClose={() => setShowAlert(false)}
@@ -179,7 +208,7 @@ export default function Listing() {
           </Toast.Header>
         </Toast>
       </ToastContainer>
-      <ToastContainer position="top-center">
+      <ToastContainer position="bottom-center">
         <Toast
           onClose={() => setShowAcceptBidSuccess(false)}
           bg="success"
@@ -194,7 +223,7 @@ export default function Listing() {
           </Toast.Header>
         </Toast>
       </ToastContainer>
-      <ToastContainer position="top-center">
+      <ToastContainer position="bottom-center">
         <Toast
           onClose={() => setShowRejectBidSuccess(false)}
           bg="success"
@@ -241,11 +270,7 @@ export default function Listing() {
               <div className="text-secondary bg-primary rounded p-2">
                 <Logo style={{ width: "80px" }} />
                 <span className="fw-bold ps-2">Recommended</span>
-                <h5 className="text-end mt-2">
-                  $
-                  {rec}{" "}
-                  SGD/mo
-                </h5>
+                <h5 className="text-end mt-2">${rec} SGD/mo</h5>
               </div>
               {
                 <div className="text-white bg-secondary rounded p-2 mt-3">
@@ -281,9 +306,7 @@ export default function Listing() {
                       bidder={topBid.bidder.email}
                       amount={topBid.amount}
                       closeListing={closeListing}
-                      listingBids={listingBids}
-                      setListingBids={setListingBids}
-                      getRecommendation={getRecommendation}
+                      updateBidStatus={updateBidStatus}
                     />
                     <div
                       type="button"
@@ -314,8 +337,7 @@ export default function Listing() {
                         bidder={bid.bidder.email}
                         amount={bid.amount}
                         closeListing={closeListing}
-                        listingBids={listingBids}
-                        setListingBids={setListingBids}
+                        updateBidStatus={updateBidStatus}
                       />
                       <div
                         type="button"

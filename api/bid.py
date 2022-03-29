@@ -23,7 +23,7 @@ def get_bids(listing_id):
         return make_response(jsonify({"bid": bid_schema.dump(bid.first())}), 200)
 
     bids = Bid.query.filter(
-        Bid.listing_id == listing_id).order_by(Bid.amount.desc())
+        Bid.listing_id == listing_id, Bid.status != "rejected").order_by(Bid.amount.desc())
     bidding_schema = BiddingSchema(many=True)
 
     return make_response(jsonify({"bids": bidding_schema.dump(bids.all())}), 200)
@@ -32,9 +32,9 @@ def get_bids(listing_id):
 @bid.route("/bids/listing/<int:listing_id>/highest", methods=["GET"])
 def get_highest_bid(listing_id):
     bid_schema = BiddingSchema()
-    bids = Bid.query.filter_by(
-        listing_id=listing_id).order_by(Bid.amount.desc())
-    return make_response(jsonify({"highest": bid_schema.dump(bids.first())}), 200)
+    bids = Bid.query.filter(Bid.listing_id == listing_id,
+                            Bid.status != "rejected").order_by(Bid.amount.desc()).first()
+    return make_response(jsonify({"highest": bid_schema.dump(bids)}), 200)
 
 
 @bid.route("/bids/user/<int:user_id>", methods=["GET"])
