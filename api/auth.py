@@ -122,10 +122,11 @@ def send_confirm_email():
 
     msg = Message('Confirm Email', recipients=[email])
 
-    if os.environ["FLASK_ENV"] == "production":
-        link = f"http://{prod_path}/confirm-email/{token}"
-    else:
-        link = ""
+    # if os.environ["FLASK_ENV"] == "production":
+    #     link = f"http://{prod_path}/confirm-email/{token}"
+    # else:
+    #     link = ""
+    link = f"http://{prod_path}/confirm-email/{token}"
     msg.body = 'Your link is {}'.format(link)
 
     mail.send(msg)
