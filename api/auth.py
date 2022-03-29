@@ -80,7 +80,7 @@ def signup_post():
 
     msg = Message('Confirm Email', recipients=[email])
 
-    if os.environ["FLASK_ENV"] == "prod":
+    if os.environ["FLASK_ENV"] == "production":
         link = f"http://{prod_path}/confirm-email/{token}"
     else:
         link = ""
