@@ -85,7 +85,6 @@ def signup_post():
     else:
         link = ""
     msg.body = 'Your link is {}'.format(link)
-
     mail.send(msg)
 
     return make_response(jsonify({"message": "Signed up"}), 200)
