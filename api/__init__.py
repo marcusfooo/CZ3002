@@ -117,18 +117,18 @@ def create_app():
     #     """, 200
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint)
+    app.register_blueprint(auth_blueprint, url_prefix="/api")
 
     from .listing import listing as listing_blueprint
-    app.register_blueprint(listing_blueprint)
+    app.register_blueprint(listing_blueprint, url_prefix="/api")
 
     from .images import images as images_blueprint
-    app.register_blueprint(images_blueprint)
+    app.register_blueprint(images_blueprint, url_prefix="/api")
 
     from .bid import bid as bid_blueprint
-    app.register_blueprint(bid_blueprint)
+    app.register_blueprint(bid_blueprint, url_prefix="/api")
 
     from .model import model as model_blueprint
-    app.register_blueprint(model_blueprint)
+    app.register_blueprint(model_blueprint, url_prefix="/api")
 
     return app
