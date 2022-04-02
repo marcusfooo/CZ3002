@@ -18,7 +18,7 @@ const loginSchema = yup
     email: yup
       .string()
       .email("Email is invalid")
-      .required("Please enter your email"),
+      .required("Email must not be empty"),
     password: yup.string().required("Password cannot be empty"),
   })
   .required();
@@ -29,7 +29,10 @@ const signupSchema = yup
       .string()
       .email("Email is invalid")
       .required("Email must not be empty"), //ntu domain exists at the endof string
-    password: yup.string().required("Password cannot be empty."),
+    password: yup
+      .string()
+      .required("Password cannot be empty.")
+      .min(8, "Password must be at least 8 characters"),
     passwordConfirm: yup
       .string()
       .oneOf([yup.ref("password"), null], "Passwords must match."),

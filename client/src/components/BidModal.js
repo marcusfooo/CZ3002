@@ -1,4 +1,3 @@
-import axios from "../axios";
 import React from "react";
 import Button from "react-bootstrap/esm/Button";
 import Modal from "react-bootstrap/Modal";
@@ -17,10 +16,6 @@ export default function BidModal({
   amount,
   closeListing,
   updateBidStatus,
-  currentBids,
-  setListingBids,
-  setTopBid,
-  setFilteredBids,
 }) {
   const { currentUser } = useUser();
   const navigate = useNavigate();

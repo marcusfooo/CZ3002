@@ -22,21 +22,31 @@ import Spinner from "react-bootstrap/Spinner";
 
 const listingSchema = yup
   .object({
-    title: yup.string(100).required(),
+    title: yup
+      .string()
+      .label("Title")
+      .max(100, "Maximum 100 characters allowed")
+      .required(),
     postalCode: yup
       .string()
-      .matches(/\d{6}/, "Invalid Singapore postal code")
-      .required(),
-    location: yup.string().required(),
+      .label("Postal Code")
+      .required()
+      .matches(/\d{6}/, "Invalid Singapore postal code"),
+    location: yup.string().label("Location").required(),
     isRoom: yup
       .string()
+      .typeError("Listing Type is a required field")
       .required()
       .matches(/(room|unit)/),
-    description: yup.string().max(500),
+    description: yup
+      .string()
+      .label("Description")
+      .max(500, "Maximum 500 characters allowed"),
     price: yup
       .number()
+      .label("Price")
       .typeError("Please enter a valid number")
-      .integer()
+      .integer("Price must be an integer")
       .required(),
     numRooms: yup
       .number()
@@ -215,7 +225,7 @@ export default function NewListing() {
                     placeholder="Enter a title"
                     required
                   />
-                  <p className="text-danger">{errors.postalCode?.message}</p>
+                  <p className="text-danger">{errors.title?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <label
@@ -256,6 +266,7 @@ export default function NewListing() {
                       Whole unit
                     </label>
                   </div>
+                  <p className="text-danger">{errors.isRoom?.message}</p>
                 </div>
                 <div className="form-group mt-3">
                   <label htmlFor="postalCode">Postal Code</label>
