@@ -47,6 +47,7 @@ const listingSchema = yup
       .label("Price")
       .typeError("Please enter a valid number")
       .integer("Price must be an integer")
+      .moreThan(0, "Price cannot be negative or 0")
       .required(),
     numRooms: yup
       .number()
