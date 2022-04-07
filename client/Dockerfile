@@ -1,5 +1,6 @@
-FROM node:10.15.2-alpine
+FROM node:15.13-alpine as builder
 RUN mkdir /frontend
 WORKDIR /frontend
-COPY package.json /frontend/package.json
-RUN npm install
+COPY . .
+RUN npm install react-scripts
+RUN npm run build
