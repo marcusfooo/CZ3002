@@ -89,32 +89,32 @@ def create_app():
         </html>
         """, 200
 
-    # @app.route('/model', methods=["GET", "POST"])
-    # def model_req():
-    #     model_filename = 'lgb_cz2006.pkl'
-    #     model_path = f"models/{model_filename}"
+    @app.route('/model', methods=["GET", "POST"])
+    def model_req():
+        model_filename = 'lgb_cz2006.pkl'
+        model_path = f"models/{model_filename}"
 
 
-    #     gbm_pickle = joblib.load(model_path)
-    #     res = pd.DataFrame(columns=['town', 'flat_type']) 
-    #     try:
-    #         town = request.args['town']
-    #         flat_type = request.args['flat_type']
-    #         res.loc[0] = [town,flat_type]
-    #         for c in res.columns:
-    #             res[c] = res[c].astype('category')
-    #         pred = gbm_pickle.predict(res)[0]
-    #         res_dict = {'pred':pred}
-    #         # return str(pred)
-    #         return jsonify({"listing": res_dict})
-    #     except:
-    #          return """
-    #     <!DOCTYPE html>
-    #     <html>
-    #     <head><title>Hello</title></head>
-    #     <body><h1>Error with model inputs</h1></body>
-    #     </html>
-    #     """, 200
+        gbm_pickle = joblib.load(model_path)
+        res = pd.DataFrame(columns=['town', 'flat_type']) 
+        try:
+            town = request.args['town']
+            flat_type = request.args['flat_type']
+            res.loc[0] = [town,flat_type]
+            for c in res.columns:
+                res[c] = res[c].astype('category')
+            pred = gbm_pickle.predict(res)[0]
+            res_dict = {'pred':pred}
+            # return str(pred)
+            return jsonify({"listing": res_dict})
+        except:
+             return """
+        <!DOCTYPE html>
+        <html>
+        <head><title>Hello</title></head>
+        <body><h1>Error with model inputs</h1></body>
+        </html>
+        """, 200
     # blueprint for auth routes in our app
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix="/api")

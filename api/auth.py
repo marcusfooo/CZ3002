@@ -83,7 +83,7 @@ def signup_post():
     if os.environ["FLASK_ENV"] == "production":
         link = f"http://{prod_path}/confirm-email/{token}"
     else:
-        link = ""
+        link = f"http://localhost:3000/confirm-email/{token}"
     msg.body = 'Your link is {}'.format(link)
     mail.send(msg)
 
