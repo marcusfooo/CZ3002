@@ -63,7 +63,7 @@ def post_listing():
     price = listing_data["price"]
     numRooms = listing_data["numRooms"]
     seller_id = current_user.id
-
+    print("Listing data is", listing_data)
     new_listing = Listing(postalCode=postalCode, location=location, isRoom=isRoom, title=title,
                           description=description, price=price, numRooms=numRooms, seller_id=seller_id)
 
