@@ -42,6 +42,9 @@ class TestAuth:
     
     def test_signup_post_email_exists(self):
         return 0
+    
+    def test_logout(self):
+        return 0
 
     def test_confirm_email_success(self):
         return 0
