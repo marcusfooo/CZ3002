@@ -11,6 +11,8 @@ import boto3
 import joblib
 import pandas as pd
 
+
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
@@ -63,15 +65,13 @@ def create_app():
         return response
 
     db.init_app(app)
-    # db.init_app()
-
     ma.init_app(app)
     mail.init_app(app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
 
-    from .models.user import User
+    from ..models.user import User
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -116,19 +116,19 @@ def create_app():
         </html>
         """, 200
     # blueprint for auth routes in our app
-    from .auth import auth as auth_blueprint
+    from ..auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix="/api")
 
-    from .listing import listing as listing_blueprint
+    from ..listing import listing as listing_blueprint
     app.register_blueprint(listing_blueprint, url_prefix="/api")
 
-    from .images import images as images_blueprint
+    from ..images import images as images_blueprint
     app.register_blueprint(images_blueprint, url_prefix="/api")
 
-    from .bid import bid as bid_blueprint
+    from ..bid import bid as bid_blueprint
     app.register_blueprint(bid_blueprint, url_prefix="/api")
 
-    from .model import model as model_blueprint
+    from ..model import model as model_blueprint
     app.register_blueprint(model_blueprint, url_prefix="/api")
 
     return app
