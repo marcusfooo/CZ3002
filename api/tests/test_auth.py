@@ -22,4 +22,32 @@
 #                           new_user)
     
 #     assert response.status_code == 200
+import pytest 
+
+class TestAuth:
+    def test_login_post_success(self):
+        return 0
     
+    def test_login_post_wrong_password(self):
+        return 0
+    
+    def test_login_post_email_unverified(self):
+        return 0
+    
+    def test_signup_post_success(self):
+        return 0
+    
+    def test_signup_post_invalid_pw(self):
+        return 0
+    
+    def test_signup_post_email_exists(self):
+        return 0
+
+    def test_confirm_email_success(self):
+        return 0
+
+    def test_confirm_email_expired(self):
+        return 0
+
+    def test_send_confirm_email(self):
+        return 0
