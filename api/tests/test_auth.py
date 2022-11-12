@@ -7,9 +7,9 @@ import time
 
 
 import sys
-# sys.path.insert(0, '../api')
-# import pprint
-# pprint.pprint(sys.path)
+sys.path.insert(0, '../api')
+import pprint
+pprint.pprint(sys.path)
 
 from test_client import create_app
 from user import User
@@ -36,7 +36,7 @@ class TestAuth:
 
         
     def test_login_post_success(self):
-        email = 'shaoyk0212@gmail.com'
+        email = 'test@gmail.com'
         password = '123456789'
         user = User.query.filter_by(email=email).first()
 
@@ -49,7 +49,7 @@ class TestAuth:
         
     
     def test_login_post_wrong_password(self):
-        email = 'shaoyk0212@gmail.com'
+        email = 'test@gmail.com'
         password = 'abddfsfdfsx'
         
         user = User.query.filter_by(email=email).first()
@@ -58,7 +58,7 @@ class TestAuth:
         
     
     def test_login_post_email_unverified(self):
-        email = 'shaoyk0212@gmail.com'
+        email = 'test@gmail.com'
         password = 'abddfsfdfsx'
         
         user = User.query.filter_by(email=email).first()     
@@ -68,7 +68,7 @@ class TestAuth:
     
     def test_signup_post_success(self):
         url = '/api/singup'
-        email = 'shao0041@e.ntu.edu.sg'
+        email = 'testt@e.ntu.edu.sg'
         password = '123456789'
         
         user = User.query.filter_by(email=email).first()
@@ -81,7 +81,7 @@ class TestAuth:
     
     def test_signup_post_invalid_pw(self):
         url = '/api/singup'
-        email = 'shao0041@e.ntu.edu.sg'
+        email = 'testt@e.ntu.edu.sg'
         password = '123459'
         
         user = User.query.filter_by(email=email).first()
@@ -94,7 +94,7 @@ class TestAuth:
     
     
     def test_signup_post_email_exists(self):
-        email = 'shaoyk0212@gmail.com'
+        email = 'test1@gmail.com'
         password = 'abddfsfdfsx'
         
         user = User.query.filter_by(email=email).first()
@@ -104,7 +104,7 @@ class TestAuth:
         
     
     def test_logout(self):
-        email = 'shaoyk0212@gmail.com'
+        email = 'testt@gmail.com'
         password = '123456789'
         user = User.query.filter_by(email=email).first()
         
@@ -115,7 +115,7 @@ class TestAuth:
         # pass
 
     def test_confirm_email_success(self):
-        email = 'shao0041@e.ntu.edu.sg'
+        email = 'testttt@e.ntu.edu.sg'
         token = auth_s.dumps(email, salt='email-confirm')
         
         response = confirm_email(token)
@@ -124,7 +124,7 @@ class TestAuth:
         
 
     def test_confirm_email_expired(self):
-        email = 'shao0041@e.ntu.edu.sg'
+        email = 'testttt@e.ntu.edu.sg'
         token = auth_s.dumps(email, salt='email-confirm', expires_in=0.0001)
         time.sleep(0.0002)
         response = confirm_email(token)

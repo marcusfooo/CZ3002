@@ -11,8 +11,6 @@ import boto3
 import joblib
 import pandas as pd
 
-
-
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env'))
 
@@ -28,7 +26,7 @@ def create_app():
     model_filename = 'lgb_cz2006.pkl'
     model_path = f"models/{model_filename}"
     bucket = s3.Bucket('cz2006-bucket')
-    bucket.download_file(f'model/{model_filename}', model_path)
+    # bucket.download_file(f'D:/1. Academic/6. Y4S1/CZ3002/Project/CZ3002/api/model/{model_filename}', model_path)
     
     app.config["APPLICATION_ROOT"] = "/api"
     CORS(app, supports_credentials=True)
@@ -65,6 +63,8 @@ def create_app():
         return response
 
     db.init_app(app)
+    # db.init_app()
+
     ma.init_app(app)
     mail.init_app(app)
 
